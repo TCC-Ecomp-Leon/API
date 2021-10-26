@@ -1,0 +1,45 @@
+{
+  "name": "typescript-base",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "ts-node-dev src/index.ts",
+    "test": "jest"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "testMatch": [
+      "<rootDir>/**/*.test.ts"
+    ]
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/jest": "^27.0.1",
+    "@types/node": "^14.0.27",
+    "jest": "^27.1.0",
+    "prettier": "^2.2.1",
+    "ts-jest": "^27.0.5",
+    "typescript": "^3.9.7"
+  },
+  "dependencies": {
+    "@firebase/firestore-types": "^2.3.0",
+    "@types/express": "^4.17.12",
+    "@types/jsonwebtoken": "^8.5.5",
+    "@types/mongoose": "^5.11.97",
+    "@types/uuid": "^8.3.1",
+    "ajv": "^8.6.2",
+    "axios": "^0.23.0",
+    "body-parser": "^1.19.0",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "firebase": "^8.7.1",
+    "firebase-admin": "^9.10.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.13.0",
+    "ts-node-dev": "^1.1.6",
+    "uuid": "^8.3.2"
+  }
+}
