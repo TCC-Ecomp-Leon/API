@@ -32,14 +32,16 @@ const addData = async <T>(
 
 const updateData = async <T>(
   collection: string,
-  data: Partial<T> & { id: string },
+  keyField: keyof T,
+  field: any,
+  data: Partial<T>,
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<null>> => {
   try {
     await db
       .collection(collection)
-      .updateOne({ id: data.id }, { $set: data }, { session });
+      .updateOne({ [keyField]: field }, { $set: data }, { session });
     return { success: true, data: null };
   } catch (e) {
     return {
