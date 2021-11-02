@@ -110,6 +110,7 @@ test('Criação, aprovação e adição de curso em um projeto', async () => {
 
   const cursoSemAlunos: Curso = {
     id: idCursoSemAlunos,
+    idProjeto: uuid(),
     nome: 'Curso Test',
     descricao: 'Teste',
     inicioCurso: new Date(),
@@ -218,6 +219,7 @@ test('Leitura de cursos que um aluno participa', async () => {
 
   const cursoComAlunos: Curso = {
     id: idCursoComAlunos,
+    idProjeto: uuid(),
     nome: 'Curso Test',
     descricao: 'Teste',
     inicioCurso: new Date(),
