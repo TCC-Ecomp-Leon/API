@@ -95,20 +95,26 @@ const adicionarProjeto = async (
 };
 
 const aprovarProjeto = (
-  idProjeto: string,
+  emailProjeto: string,
   idPerfilResponsavel: string,
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<null>> => {
-  const projetoParcial: Partial<Projeto> & { id: string } = {
-    id: idProjeto,
+  const projetoParcial: Partial<Projeto> = {
     aprovado: true,
     idPerfilResponsavel: idPerfilResponsavel,
     entradaEm: new Date(),
     cursos: [],
   };
 
-  return Database.updateData<Projeto>(collection, projetoParcial, db, session);
+  return Database.updateData<Projeto>(
+    collection,
+    'email',
+    emailProjeto,
+    projetoParcial,
+    db,
+    session
+  );
 };
 
 const adicionarCurso = (
