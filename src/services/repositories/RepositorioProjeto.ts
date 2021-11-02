@@ -53,7 +53,7 @@ const readCursosAluno = async (
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<Curso[]>> => {
-  return Database.readDatas<Projeto, Curso>(
+  const cursos = await Database.readDatas<Projeto, { cursos: Curso[] }>(
     collection,
     [
       {
@@ -65,6 +65,19 @@ const readCursosAluno = async (
     session,
     ['cursos']
   );
+
+  if (!cursos.success) return cursos;
+
+  return {
+    success: true,
+    data:
+      cursos.data.length > 0
+        ? Array.prototype.concat.apply(
+            [],
+            cursos.data.map((curso) => curso.cursos)
+          )
+        : [],
+  };
 };
 
 const adicionarProjeto = async (
@@ -144,7 +157,7 @@ export default {
   readProjeto, //testado
   readProjetoPorEmail, //testado
   readCursosProjeto, //testado
-  readCursosAluno,
+  readCursosAluno, //testado
   adicionarProjeto, //testado
   aprovarProjeto, //testado
   adicionarCurso, //testado
