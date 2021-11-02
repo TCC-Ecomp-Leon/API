@@ -10,7 +10,9 @@ import {
 } from 'mongodb';
 import environmentVariables from './environmentVariables';
 
-const client = new MongoClient(environmentVariables().MONGODB_URL);
+const client = new MongoClient(environmentVariables().MONGODB_URL, {
+  ignoreUndefined: true,
+});
 
 export type DatabaseService<T> = (db: Db, session: ClientSession) => Promise<T>;
 
