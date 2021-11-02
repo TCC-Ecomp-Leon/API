@@ -22,12 +22,12 @@ const readProjetoPorEmail = (
   return Database.readData<Projeto>(collection, 'email', email, db, session);
 };
 
-const readCursosProjeto = (
+const readCursosProjeto = async (
   idProjeto: string,
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<Curso[]>> => {
-  return Database.readDatas<Projeto, Curso>(
+  const cursos = await Database.readDatas<Projeto, { cursos: Curso[] }>(
     collection,
     [
       {
@@ -39,6 +39,13 @@ const readCursosProjeto = (
     session,
     ['cursos']
   );
+
+  if (!cursos.success) return cursos;
+
+  return {
+    success: true,
+    data: cursos.data.length > 0 ? cursos.data[0].cursos : [],
+  };
 };
 
 const readCursosAluno = async (
@@ -123,15 +130,22 @@ const adicionarCurso = (
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<null>> => {
-  return Database.updatePushData(collection, idProjeto, curso, db, session);
+  return Database.updatePushData<Projeto, Curso>(
+    collection,
+    idProjeto,
+    'cursos',
+    curso,
+    db,
+    session
+  );
 };
 
 export default {
-  readProjeto,
-  readProjetoPorEmail,
-  readCursosProjeto,
+  readProjeto, //testado
+  readProjetoPorEmail, //testado
+  readCursosProjeto, //testado
   readCursosAluno,
-  adicionarProjeto,
-  aprovarProjeto,
-  adicionarCurso,
+  adicionarProjeto, //testado
+  aprovarProjeto, //testado
+  adicionarCurso, //testado
 };
