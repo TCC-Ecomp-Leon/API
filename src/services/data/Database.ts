@@ -51,17 +51,18 @@ const updateData = async <T>(
   }
 };
 
-const updatePushData = async <T>(
+const updatePushData = async <T, M>(
   collection: string,
   id: string,
-  data: T,
+  keyField: keyof T | string,
+  data: M,
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<null>> => {
   try {
     await db
       .collection(collection)
-      .updateOne({ id: id }, { $push: data }, { session });
+      .updateOne({ id: id }, { $push: { [keyField]: data } }, { session });
     return { success: true, data: null };
   } catch (e) {
     return {
