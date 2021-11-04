@@ -155,8 +155,8 @@ export const withDatabaseTransaction = async <T>(
         resolve(result);
       }, transactionOptions);
     } catch (e) {
-      console.warn('MONGODB ERROR');
-      console.warn(e);
+      // console.warn('MONGODB ERROR');
+      // console.warn(e);
       await session.endSession();
       await client.close();
       reject(e);
