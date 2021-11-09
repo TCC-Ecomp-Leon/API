@@ -143,7 +143,7 @@ const aprovarProjeto = (
     cursos: [],
   };
 
-  return Database.updateData<Projeto>(
+  return Database.updatePartialData<Projeto>(
     collection,
     [
       {
@@ -198,13 +198,32 @@ const adicionarAlunoAoCurso = (
   );
 };
 
-// const atribuirProfessorAoCurso = (
-//   idProjeto: string,
-//   idCurso: string,
-//   idAluno: string,
-//   db: Db,
-//   session: ClientSession
-// ): Promise<DatabaseResult<null>> => {};
+const atribuirProfessorAMateria = (
+  idProjeto: string,
+  idCurso: string,
+  idMateria: string,
+  idProfessor: string,
+  db: Db,
+  session: ClientSession
+): Promise<DatabaseResult<null>> => {
+  const identificadorProjeto: keyof Projeto = 'id';
+  const identificadorCurso = 'cursos.$.id';
+  const identificadorMateria = 'cursos.$.materias.$.id';
+
+  const identificadorProfessorMateria = 'cursos.$.materias.$.idPerfilProfessor';
+
+  return Database.updateGenericData<Projeto, string>(
+    collection,
+    [
+      { key: identificadorProjeto, value: idProjeto },
+      { key: identificadorCurso, value: idCurso },
+      { key: identificadorMateria, value: idMateria },
+    ],
+    [{ key: identificadorProfessorMateria, value: idProfessor }],
+    db,
+    session
+  );
+};
 
 export default {
   readProjeto, //testado
@@ -215,5 +234,5 @@ export default {
   aprovarProjeto, //testado
   adicionarCurso, //testado
   adicionarAlunoAoCurso,
-  // atribuirProfessorAoCurso,
+  atribuirProfessorAMateria,
 };
