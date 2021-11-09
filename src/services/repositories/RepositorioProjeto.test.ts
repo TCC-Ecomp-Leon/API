@@ -5,6 +5,7 @@ import {
   DatabaseService,
   withDatabaseTransaction,
 } from '../../config/database';
+import Database from '../data/Database';
 
 test('Criação e leitura de um projeto', async () => {
   const nomeProjeto = 'Projeto test';
@@ -284,6 +285,242 @@ test('Leitura de cursos que um aluno participa', async () => {
         data: [cursoComAlunos],
       });
     }
+  };
+
+  await withDatabaseTransaction(service, undefined, true);
+});
+
+test('Adição de alunos em um curso', async () => {
+  const nomeProjeto = 'Projeto test';
+  const emailProjeto = 'projeto@test.com';
+  const descricaoProjeto = 'Teste';
+  const telefoneProjeto = 12999999999;
+  const enderecoProjeto: Endereco = {
+    rua: 'Rua Teste',
+    numero: 0,
+    bairro: 'Bairro Teste',
+    cidade: 'Cidade Teste',
+    estado: 'SP',
+    cep: 12332000,
+    localizacao: {
+      lat: 0,
+      lng: 0,
+    },
+  };
+  const idPerfilResponsavel = uuid();
+
+  const idCursoSemAlunos = uuid();
+
+  const materiaSemAlunos: Materia = {
+    id: uuid(),
+    nome: 'Curso Test',
+    descricao: 'Teste',
+    idCurso: idCursoSemAlunos,
+  };
+
+  const service: DatabaseService<void> = async (db, session) => {
+    const addProjeto = await RepositorioProjeto.adicionarProjeto(
+      nomeProjeto,
+      descricaoProjeto,
+      emailProjeto,
+      telefoneProjeto,
+      enderecoProjeto,
+      db,
+      session
+    );
+
+    expect(addProjeto.success).toBe(true);
+
+    if (!addProjeto.success) throw addProjeto.error;
+
+    const cursoSemAlunos: Curso = {
+      id: idCursoSemAlunos,
+      idProjeto: addProjeto.data,
+      nome: 'Curso Test',
+      descricao: 'Teste',
+      inicioCurso: new Date(),
+      fimCurso: new Date(),
+      atualizadoEm: new Date(),
+      turma: [],
+      materias: [materiaSemAlunos],
+    };
+
+    const resultadoAprovacao = await RepositorioProjeto.aprovarProjeto(
+      emailProjeto,
+      idPerfilResponsavel,
+      db,
+      session
+    );
+    expect(resultadoAprovacao.success).toBe(true);
+
+    const readProjeto = await RepositorioProjeto.readProjetoPorEmail(
+      emailProjeto,
+      db,
+      session
+    );
+    expect(readProjeto.success).toBe(true);
+
+    if (!readProjeto.success) throw readProjeto.error;
+
+    const projeto = readProjeto.data;
+    expect(projeto.nome).toBe(nomeProjeto);
+    expect(projeto.descricao).toBe(descricaoProjeto);
+    expect(projeto.email).toBe(emailProjeto);
+    expect(projeto.telefone).toBe(telefoneProjeto);
+    expect(projeto.endereco).toStrictEqual(enderecoProjeto);
+    expect(projeto.aprovado).toBe(true);
+
+    if (!projeto.aprovado) return;
+
+    expect(projeto.idPerfilResponsavel).toBe(idPerfilResponsavel);
+    expect(projeto.cursos).toStrictEqual([]);
+
+    const addCurso = await RepositorioProjeto.adicionarCurso(
+      projeto.id,
+      cursoSemAlunos,
+      db,
+      session
+    );
+    expect(addCurso.success).toBe(true);
+
+    const alunosParaAdicionar = [uuid(), uuid(), uuid()];
+    for (let i = 0; i < alunosParaAdicionar.length; i++) {
+      const result = await RepositorioProjeto.adicionarAlunoAoCurso(
+        projeto.id,
+        cursoSemAlunos.id,
+        alunosParaAdicionar[i],
+        db,
+        session
+      );
+
+      expect(result.success).toBe(true);
+    }
+
+    const cursos = await RepositorioProjeto.readCursosProjeto(
+      projeto.id,
+      db,
+      session
+    );
+    if (!cursos.success) throw cursos.error;
+
+    expect(cursos).toStrictEqual({
+      success: true,
+      data: [{ ...cursoSemAlunos, turma: alunosParaAdicionar }],
+    });
+  };
+
+  await withDatabaseTransaction(service, undefined, true);
+});
+
+test('Atribuição de professor à matéria', async () => {
+  const nomeProjeto = 'Projeto test';
+  const emailProjeto = 'projeto@test.com';
+  const descricaoProjeto = 'Teste';
+  const telefoneProjeto = 12999999999;
+  const enderecoProjeto: Endereco = {
+    rua: 'Rua Teste',
+    numero: 0,
+    bairro: 'Bairro Teste',
+    cidade: 'Cidade Teste',
+    estado: 'SP',
+    cep: 12332000,
+    localizacao: {
+      lat: 0,
+      lng: 0,
+    },
+  };
+  const idPerfilResponsavel = uuid();
+
+  const idCursoSemAlunos = uuid();
+
+  const materiaSemAlunos: Materia = {
+    id: uuid(),
+    nome: 'Curso Test',
+    descricao: 'Teste',
+    idCurso: idCursoSemAlunos,
+  };
+
+  const service: DatabaseService<void> = async (db, session) => {
+    const addProjeto = await RepositorioProjeto.adicionarProjeto(
+      nomeProjeto,
+      descricaoProjeto,
+      emailProjeto,
+      telefoneProjeto,
+      enderecoProjeto,
+      db,
+      session
+    );
+
+    expect(addProjeto.success).toBe(true);
+
+    if (!addProjeto.success) throw addProjeto.error;
+
+    const cursoSemAlunos: Curso = {
+      id: idCursoSemAlunos,
+      idProjeto: addProjeto.data,
+      nome: 'Curso Test',
+      descricao: 'Teste',
+      inicioCurso: new Date(),
+      fimCurso: new Date(),
+      atualizadoEm: new Date(),
+      turma: [],
+      materias: [materiaSemAlunos],
+    };
+
+    const resultadoAprovacao = await RepositorioProjeto.aprovarProjeto(
+      emailProjeto,
+      idPerfilResponsavel,
+      db,
+      session
+    );
+    expect(resultadoAprovacao.success).toBe(true);
+
+    const readProjeto = await RepositorioProjeto.readProjetoPorEmail(
+      emailProjeto,
+      db,
+      session
+    );
+    expect(readProjeto.success).toBe(true);
+
+    if (!readProjeto.success) throw readProjeto.error;
+
+    const projeto = readProjeto.data;
+
+    const addCurso = await RepositorioProjeto.adicionarCurso(
+      projeto.id,
+      cursoSemAlunos,
+      db,
+      session
+    );
+    expect(addCurso.success).toBe(true);
+
+    const idProfessor = uuid();
+
+    const atribuirProfessorAMateria =
+      await RepositorioProjeto.atribuirProfessorAMateria(
+        projeto.id,
+        cursoSemAlunos.id,
+        materiaSemAlunos.id,
+        idProfessor,
+        db,
+        session
+      );
+    expect(atribuirProfessorAMateria.success).toBe(true);
+
+    const cursos = await RepositorioProjeto.readCursosProjeto(
+      projeto.id,
+      db,
+      session
+    );
+    if (!cursos.success) throw cursos.error;
+
+    const listaCursos = cursos.data;
+
+    expect(listaCursos.length).toBe(1);
+    expect(listaCursos[0].materias.length).toBe(1);
+    expect(listaCursos[0].materias[0].idPerfilProfessor as string).toBe(
+      idProfessor
+    );
   };
 
   await withDatabaseTransaction(service, undefined, true);
