@@ -183,7 +183,7 @@ const adicionarAlunoAoCurso = (
   session: ClientSession
 ): Promise<DatabaseResult<null>> => {
   const identificadorProjeto: keyof Projeto = 'id';
-  const identificadorCurso = 'cursos.$.id';
+  const identificadorCurso = 'cursos.id';
 
   return Database.updatePushData<Projeto, string>(
     collection,
@@ -207,10 +207,11 @@ const atribuirProfessorAMateria = (
   session: ClientSession
 ): Promise<DatabaseResult<null>> => {
   const identificadorProjeto: keyof Projeto = 'id';
-  const identificadorCurso = 'cursos.$.id';
-  const identificadorMateria = 'cursos.$.materias.$.id';
+  const identificadorCurso = 'cursos.id';
+  const identificadorMateria = 'cursos.materias.id';
 
-  const identificadorProfessorMateria = 'cursos.$.materias.$.idPerfilProfessor';
+  const identificadorProfessorMateria =
+    'cursos.$[].materias.$[].idPerfilProfessor';
 
   return Database.updateGenericData<Projeto, string>(
     collection,
@@ -233,6 +234,6 @@ export default {
   adicionarProjeto, //testado
   aprovarProjeto, //testado
   adicionarCurso, //testado
-  adicionarAlunoAoCurso,
-  atribuirProfessorAMateria,
+  adicionarAlunoAoCurso, //testado
+  atribuirProfessorAMateria, //testado
 };
