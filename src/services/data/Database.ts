@@ -2,6 +2,7 @@ import { ClientSession, Db, FindCursor, Document } from 'mongodb';
 import { DatabaseResult } from '../../structure/databaseResult';
 
 export type SearchType<T> = { key: keyof T | string; value: any };
+export type GenericUpdateField<T> = { key: keyof T | string; value: any };
 
 const removeEmptyObjects = <T>(array: any[]): T[] => {
   const list: T[] = [];
@@ -15,7 +16,9 @@ const removeEmptyObjects = <T>(array: any[]): T[] => {
   return list;
 };
 
-const getSearchValues = <T>(searchParameters: SearchType<T>[]): object => {
+const _getValues = <T>(
+  searchParameters: SearchType<T>[] | GenericUpdateField<T>[]
+): object => {
   let search: object = {};
 
   if (searchParameters.length === 0) {
@@ -45,7 +48,7 @@ const addData = async <T>(
   }
 };
 
-const updateData = async <T>(
+const updatePartialData = async <T>(
   collection: string,
   searchParameters: SearchType<T>[],
   data: Partial<T>,
@@ -55,11 +58,7 @@ const updateData = async <T>(
   try {
     await db
       .collection(collection)
-      .updateOne(
-        getSearchValues(searchParameters),
-        { $set: data },
-        { session }
-      );
+      .updateOne(_getValues(searchParameters), { $set: data }, { session });
     return { success: true, data: null };
   } catch (e) {
     return {
@@ -81,8 +80,32 @@ const updatePushData = async <T, M>(
     const result = await db
       .collection(collection)
       .updateOne(
-        getSearchValues(searchParameters),
+        _getValues(searchParameters),
         { $push: { [keyField]: data } },
+        { session }
+      );
+    return { success: true, data: null };
+  } catch (e) {
+    return {
+      success: false,
+      error: e as Error,
+    };
+  }
+};
+
+const updateGenericData = async <T, M>(
+  collection: string,
+  searchParameters: SearchType<T>[],
+  updateParameters: GenericUpdateField<T>[],
+  db: Db,
+  session: ClientSession
+): Promise<DatabaseResult<null>> => {
+  try {
+    const result = await db
+      .collection(collection)
+      .updateOne(
+        _getValues(searchParameters),
+        { $set: _getValues(updateParameters) },
         { session }
       );
     return { success: true, data: null };
@@ -103,7 +126,7 @@ const readData = async <T>(
   try {
     const response = await db
       .collection(collection)
-      .find(getSearchValues(searchParameters), { session: session })
+      .find(_getValues(searchParameters), { session: session })
       .toArray();
 
     if (response.length === 0) {
@@ -144,7 +167,7 @@ const readDatas = async <T, M>(
 
     const response = await db
       .collection(collection)
-      .find(getSearchValues(searchParameters), {
+      .find(_getValues(searchParameters), {
         projection: responseFields,
         session: session,
       })
@@ -193,7 +216,7 @@ const remove = async <T>(
   try {
     const response = await db
       .collection(collection)
-      .findOneAndDelete(getSearchValues(searchParameters), { session });
+      .findOneAndDelete(_getValues(searchParameters), { session });
 
     return {
       success: true,
@@ -212,7 +235,8 @@ export default {
   readData,
   readDatas,
   readCollection,
-  updateData,
+  updatePartialData,
+  updateGenericData,
   updatePushData,
   remove,
 };
