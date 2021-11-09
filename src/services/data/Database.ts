@@ -1,6 +1,8 @@
 import { ClientSession, Db, FindCursor, Document } from 'mongodb';
 import { DatabaseResult } from '../../structure/databaseResult';
 
+export type SearchType<T> = { key: keyof T | string; value: any };
+
 const removeEmptyObjects = <T>(array: any[]): T[] => {
   const list: T[] = [];
 
@@ -11,6 +13,19 @@ const removeEmptyObjects = <T>(array: any[]): T[] => {
   });
 
   return list;
+};
+
+const getSearchValues = <T>(searchParameters: SearchType<T>[]): object => {
+  let search: object = {};
+
+  if (searchParameters.length === 0) {
+    throw Error("Can't use a query service without search parameters");
+  }
+  for (let i = 0; i < searchParameters.length; i++) {
+    const { key, value } = searchParameters[i];
+    search = { ...search, [key]: value };
+  }
+  return search;
 };
 
 const addData = async <T>(
@@ -32,8 +47,7 @@ const addData = async <T>(
 
 const updateData = async <T>(
   collection: string,
-  keyField: keyof T,
-  field: any,
+  searchParameters: SearchType<T>[],
   data: Partial<T>,
   db: Db,
   session: ClientSession
@@ -41,7 +55,11 @@ const updateData = async <T>(
   try {
     await db
       .collection(collection)
-      .updateOne({ [keyField]: field }, { $set: data }, { session });
+      .updateOne(
+        getSearchValues(searchParameters),
+        { $set: data },
+        { session }
+      );
     return { success: true, data: null };
   } catch (e) {
     return {
@@ -53,16 +71,20 @@ const updateData = async <T>(
 
 const updatePushData = async <T, M>(
   collection: string,
-  id: string,
+  searchParameters: SearchType<T>[],
   keyField: keyof T | string,
   data: M,
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<null>> => {
   try {
-    await db
+    const result = await db
       .collection(collection)
-      .updateOne({ id: id }, { $push: { [keyField]: data } }, { session });
+      .updateOne(
+        getSearchValues(searchParameters),
+        { $push: { [keyField]: data } },
+        { session }
+      );
     return { success: true, data: null };
   } catch (e) {
     return {
@@ -74,15 +96,14 @@ const updatePushData = async <T, M>(
 
 const readData = async <T>(
   collection: string,
-  keyField: keyof T,
-  field: any,
+  searchParameters: SearchType<T>[],
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<T>> => {
   try {
     const response = await db
       .collection(collection)
-      .find({ [keyField]: field }, { session: session })
+      .find(getSearchValues(searchParameters), { session: session })
       .toArray();
 
     if (response.length === 0) {
@@ -106,19 +127,12 @@ const readData = async <T>(
 
 const readDatas = async <T, M>(
   collection: string,
-  condictions: { key: keyof T | string; value: any }[],
+  searchParameters: SearchType<T>[],
   db: Db,
   session: ClientSession,
   fields?: (keyof T | string)[]
 ): Promise<DatabaseResult<M[]>> => {
   try {
-    const search: { [key: string]: any } = {};
-
-    condictions.forEach((config) => {
-      const { key, value } = config;
-      search[key as string] = value;
-    });
-
     const responseFields: { [key: string]: number } = {};
 
     if (fields !== undefined) {
@@ -130,7 +144,10 @@ const readDatas = async <T, M>(
 
     const response = await db
       .collection(collection)
-      .find(search, { projection: responseFields, session: session })
+      .find(getSearchValues(searchParameters), {
+        projection: responseFields,
+        session: session,
+      })
       .toArray();
     return {
       success: true,
@@ -169,15 +186,14 @@ const readCollection = async <T>(
 
 const remove = async <T>(
   collection: string,
-  keyField: keyof T,
-  field: any,
+  searchParameters: SearchType<T>[],
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<null>> => {
   try {
     const response = await db
       .collection(collection)
-      .findOneAndDelete({ [keyField]: field }, { session });
+      .findOneAndDelete(getSearchValues(searchParameters), { session });
 
     return {
       success: true,
