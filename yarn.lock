@@ -5794,7 +5794,7 @@ symbol-tree@^3.2.4:
 
 "tcc-models@git+ssh://git@github.com/TCC-Ecomp-Leon/Models.git#feature/alteraracoes-documentos":
   version "1.0.0"
-  resolved "git+ssh://git@github.com/TCC-Ecomp-Leon/Models.git#0c12765f740163426fe7eb0e8eace4056cab4f2f"
+  resolved "git+ssh://git@github.com/TCC-Ecomp-Leon/Models.git#3e821cf2ed273cb70c9d50a304ba6e6656831003"
   dependencies:
     "@types/jest" "^26.0.22"
     "@types/node" "^14.0.27"
