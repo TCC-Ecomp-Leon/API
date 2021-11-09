@@ -11,7 +11,14 @@ const readProjeto = (
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<Projeto>> => {
-  return Database.readData<Projeto>(collection, 'id', id, db, session);
+  const identificadorProjeto: keyof Projeto = 'id';
+
+  return Database.readData<Projeto>(
+    collection,
+    [{ key: identificadorProjeto, value: id }],
+    db,
+    session
+  );
 };
 
 const readProjetoPorEmail = (
@@ -19,7 +26,14 @@ const readProjetoPorEmail = (
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<Projeto>> => {
-  return Database.readData<Projeto>(collection, 'email', email, db, session);
+  const identificadorProjeto: keyof Projeto = 'email';
+
+  return Database.readData<Projeto>(
+    collection,
+    [{ key: identificadorProjeto, value: email }],
+    db,
+    session
+  );
 };
 
 const readCursosProjeto = async (
@@ -120,6 +134,8 @@ const aprovarProjeto = (
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<null>> => {
+  const identificadorProjeto: keyof Projeto = 'email';
+
   const projetoParcial: Partial<Projeto> = {
     aprovado: true,
     idPerfilResponsavel: idPerfilResponsavel,
@@ -129,8 +145,12 @@ const aprovarProjeto = (
 
   return Database.updateData<Projeto>(
     collection,
-    'email',
-    emailProjeto,
+    [
+      {
+        key: identificadorProjeto,
+        value: emailProjeto,
+      },
+    ],
     projetoParcial,
     db,
     session
@@ -143,15 +163,48 @@ const adicionarCurso = (
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<null>> => {
+  const identificadorProjeto: keyof Projeto = 'id';
+
   return Database.updatePushData<Projeto, Curso>(
     collection,
-    idProjeto,
+    [{ key: identificadorProjeto, value: idProjeto }],
     'cursos',
     curso,
     db,
     session
   );
 };
+
+const adicionarAlunoAoCurso = (
+  idProjeto: string,
+  idCurso: string,
+  idAluno: string,
+  db: Db,
+  session: ClientSession
+): Promise<DatabaseResult<null>> => {
+  const identificadorProjeto: keyof Projeto = 'id';
+  const identificadorCurso = 'cursos.$.id';
+
+  return Database.updatePushData<Projeto, string>(
+    collection,
+    [
+      { key: identificadorProjeto, value: idProjeto },
+      { key: identificadorCurso, value: idCurso },
+    ],
+    'cursos.$.turma',
+    idAluno,
+    db,
+    session
+  );
+};
+
+// const atribuirProfessorAoCurso = (
+//   idProjeto: string,
+//   idCurso: string,
+//   idAluno: string,
+//   db: Db,
+//   session: ClientSession
+// ): Promise<DatabaseResult<null>> => {};
 
 export default {
   readProjeto, //testado
@@ -161,4 +214,6 @@ export default {
   adicionarProjeto, //testado
   aprovarProjeto, //testado
   adicionarCurso, //testado
+  adicionarAlunoAoCurso,
+  // atribuirProfessorAoCurso,
 };
