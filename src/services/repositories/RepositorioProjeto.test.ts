@@ -521,6 +521,12 @@ test('Atribuição de professor à matéria', async () => {
     expect(listaCursos[0].materias[0].idPerfilProfessor as string).toBe(
       idProfessor
     );
+
+    const readMateriasProfessor =
+      await RepositorioProjeto.readMateriasProfessor(idProfessor, db, session);
+    expect(readMateriasProfessor.success).toBe(true);
+    if (!readMateriasProfessor.success) throw readMateriasProfessor.error;
+    expect(readMateriasProfessor.data.length).toBe(1);
   };
 
   await withDatabaseTransaction(service, undefined, true);
