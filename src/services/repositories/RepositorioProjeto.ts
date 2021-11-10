@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import { Db, ClientSession } from 'mongodb';
-import { Curso, Endereco, Projeto } from 'tcc-models';
+import { Curso, Endereco, Materia, Projeto } from 'tcc-models';
 import { DatabaseResult } from '../../structure/databaseResult';
 import Database from '../data/Database';
 
@@ -91,6 +91,44 @@ const readCursosAluno = async (
             cursos.data.map((curso) => curso.cursos)
           )
         : [],
+  };
+};
+
+const readMateriasProfessor = async (
+  idProfessor: string,
+  db: Db,
+  session: ClientSession
+): Promise<DatabaseResult<Materia[]>> => {
+  const cursos = await Database.readDatas<
+    Projeto,
+    { cursos: { materias: Materia[] }[] }
+  >(
+    collection,
+    [
+      {
+        key: 'cursos.materias.idPerfilProfessor',
+        value: idProfessor,
+      },
+    ],
+    db,
+    session,
+    ['cursos.materias']
+  );
+
+  if (!cursos.success) return cursos;
+
+  const materias: Materia[] = [];
+  cursos.data.forEach((projetoCursos) => {
+    projetoCursos.cursos.forEach((curso) => {
+      curso.materias.forEach((materia) => {
+        materias.push(materia);
+      });
+    });
+  });
+
+  return {
+    success: true,
+    data: materias,
   };
 };
 
@@ -231,6 +269,7 @@ export default {
   readProjetoPorEmail, //testado
   readCursosProjeto, //testado
   readCursosAluno, //testado
+  readMateriasProfessor, //testado
   adicionarProjeto, //testado
   aprovarProjeto, //testado
   adicionarCurso, //testado
