@@ -37,8 +37,7 @@ const readCursoUniversitario = (
 ): Promise<DatabaseResult<CursoUniversitario>> => {
   return Database.readData<CursoUniversitario>(
     collection,
-    'id',
-    id,
+    [{ key: 'id', value: id }],
     db,
     sesion
   );
@@ -50,10 +49,9 @@ const updateCursoUniversitario = (
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<null>> => {
-  return Database.updateData<CursoUniversitario>(
+  return Database.updatePartialData<CursoUniversitario>(
     collection,
-    'id',
-    id,
+    [{ key: 'id', value: id }],
     curso,
     db,
     session
@@ -65,7 +63,12 @@ const deleteCursoUniversitario = (
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<null>> => {
-  return Database.remove<CursoUniversitario>(collection, 'id', id, db, session);
+  return Database.remove<CursoUniversitario>(
+    collection,
+    [{ key: 'id', value: id }],
+    db,
+    session
+  );
 };
 
 export default {
