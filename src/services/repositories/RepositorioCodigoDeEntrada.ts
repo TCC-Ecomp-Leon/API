@@ -9,7 +9,11 @@ const collection = 'CodigoDeEntrada';
 const addCodigoDeEntrada = async (
   idProjeto: string,
   informacoes:
-    | { tipo: TipoCodigoDeEntrada.Professor; idMateria: string }
+    | {
+        tipo: TipoCodigoDeEntrada.Professor;
+        idCurso: string;
+        idMateria: string;
+      }
     | { tipo: TipoCodigoDeEntrada.Aluno; idCurso: string },
   db: Db,
   session: ClientSession
@@ -41,7 +45,12 @@ const readCodigoDeEntrada = (
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<CodigoDeEntrada>> => {
-  return Database.readData<CodigoDeEntrada>(collection, 'id', id, db, session);
+  return Database.readData<CodigoDeEntrada>(
+    collection,
+    [{ key: 'id', value: id }],
+    db,
+    session
+  );
 };
 
 const usarCodigoDeEntrada = (
@@ -52,10 +61,9 @@ const usarCodigoDeEntrada = (
 ): Promise<DatabaseResult<null>> => {
   //TODO: Vincular o aluno ou professor ao projeto
   //TODO: Fazer a verificação se não já foi usado
-  return Database.updateData<CodigoDeEntrada>(
+  return Database.updatePartialData<CodigoDeEntrada>(
     collection,
-    'id',
-    id,
+    [{ key: 'id', value: id }],
     { usado: false, usadoEm: new Date(), idPerfilUsou: idPerfil },
     db,
     session
