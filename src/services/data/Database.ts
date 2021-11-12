@@ -96,7 +96,7 @@ const updatePushData = async <T, M>(
 const updateGenericData = async <T, M>(
   collection: string,
   searchParameters: SearchType<T>[],
-  updateParameters: GenericUpdateField<T>[],
+  updateParameters: GenericUpdateField<M>[],
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<null>> => {
@@ -104,6 +104,30 @@ const updateGenericData = async <T, M>(
     const result = await db
       .collection(collection)
       .updateOne(
+        _getValues(searchParameters),
+        { $set: _getValues(updateParameters) },
+        { session }
+      );
+    return { success: true, data: null };
+  } catch (e) {
+    return {
+      success: false,
+      error: e as Error,
+    };
+  }
+};
+
+const updateGenericDatas = async <T, M>(
+  collection: string,
+  searchParameters: SearchType<T>[],
+  updateParameters: GenericUpdateField<M>[],
+  db: Db,
+  session: ClientSession
+): Promise<DatabaseResult<null>> => {
+  try {
+    const result = await db
+      .collection(collection)
+      .updateMany(
         _getValues(searchParameters),
         { $set: _getValues(updateParameters) },
         { session }
@@ -236,6 +260,7 @@ export default {
   readDatas,
   readCollection,
   updatePartialData,
+  updateGenericDatas,
   updateGenericData,
   updatePushData,
   remove,
