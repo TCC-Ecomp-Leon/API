@@ -55,7 +55,12 @@ const readDuvida = (
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<Duvida>> => {
-  return Database.readData<Duvida>(collection, 'id', id, db, session);
+  return Database.readData<Duvida>(
+    collection,
+    [{ key: 'id', value: id }],
+    db,
+    session
+  );
 };
 
 const readDuvidasEspecificas = (
@@ -87,15 +92,21 @@ const fecharDuvida = async (
   const resultMensagemFechar = await Database.updatePushData<
     Duvida,
     Duvida['mensagens'][0]
-  >(collection, idDuvida, campoMensagem, mensagemFechar, db, session);
+  >(
+    collection,
+    [{ key: 'id', value: idDuvida }],
+    campoMensagem,
+    mensagemFechar,
+    db,
+    session
+  );
 
   if (!resultMensagemFechar.success) return resultMensagemFechar;
 
-  const fecharDuvida = await Database.updateData<Duvida>(
+  const fecharDuvida = await Database.updateGenericData<Duvida, boolean>(
     collection,
-    'id',
-    idDuvida,
-    { resolvida: true },
+    [{ key: 'id', value: idDuvida }],
+    [{ key: 'resolvida', value: true }],
     db,
     session
   );
