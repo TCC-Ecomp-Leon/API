@@ -3,11 +3,11 @@ import { Db, ClientSession } from 'mongodb';
 import {
   ColaboracaoAtividade,
   CursoUniversitario,
+  InformacoesUniversitarioAprovado,
   InformacoesUniversitario,
 } from 'tcc-models';
 import { DatabaseResult } from '../../structure/databaseResult';
 import Database from '../data/Database';
-import { Session } from 'inspector';
 
 const collection = 'Universitario';
 
@@ -34,23 +34,24 @@ const readInformacoesUniversitario = async (
       },
     };
   } else {
-    const identificadorUniversitario: keyof (InformacoesUniversitario & {
-      universitario: true;
-    }) = 'email';
+    const identificadorUniversitario: keyof InformacoesUniversitarioAprovado =
+      'email';
 
-    const informacoes = await Database.readData<
-      InformacoesUniversitario & { universitario: true }
-    >(
-      collection,
-      [{ key: identificadorUniversitario, value: email }],
-      db,
-      session
-    );
+    const informacoes =
+      await Database.readData<InformacoesUniversitarioAprovado>(
+        collection,
+        [{ key: identificadorUniversitario, value: email }],
+        db,
+        session
+      );
     if (!informacoes.success) return informacoes;
 
     return {
       success: true,
-      data: informacoes.data,
+      data: {
+        universitario: true,
+        ...informacoes.data,
+      },
     };
   }
 };
@@ -61,10 +62,10 @@ const atualizarCurso = async (
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<null>> => {
-  type estrutura = InformacoesUniversitario & { universitario: true };
-  const identificadorUniversitario: keyof estrutura = 'email';
-  const campoGraduacao: keyof estrutura = 'graduacao';
-  const atualizacao: estrutura['graduacao'] = {
+  const identificadorUniversitario: keyof InformacoesUniversitarioAprovado =
+    'email';
+  const campoGraduacao: keyof InformacoesUniversitarioAprovado = 'graduacao';
+  const atualizacao: InformacoesUniversitarioAprovado['graduacao'] = {
     atualizadoEm: new Date(),
     curso: curso,
   };
@@ -86,9 +87,10 @@ const atrelarColaboracao = (
   session: ClientSession,
   aprovada?: boolean
 ): Promise<DatabaseResult<null>> => {
-  type estrutura = InformacoesUniversitario & { universitario: true };
-  const identificadorUniversitario: keyof estrutura = 'email';
-  const campoColaboracoes: keyof estrutura = 'atividadesQueColaborou';
+  const identificadorUniversitario: keyof InformacoesUniversitarioAprovado =
+    'email';
+  const campoColaboracoes: keyof InformacoesUniversitarioAprovado =
+    'atividadesQueColaborou';
 
   let colaboracao: ColaboracaoAtividade = {
     idAtividade: idAtividade,
@@ -156,8 +158,8 @@ const lerAtividadesNecessitandoAprovacao = async (
     'atividadesQueColaborou.atividadesQueColaborou.aprovado';
 
   const informacoes = await Database.readDatas<
-    InformacoesUniversitario,
-    InformacoesUniversitario & { universitario: true }
+    InformacoesUniversitarioAprovado,
+    InformacoesUniversitarioAprovado
   >(collection, [{ key: campoPesquisa, value: false }], db, session);
 
   let lista: ColaboracaoAtividade[] = [];
