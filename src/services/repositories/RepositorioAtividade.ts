@@ -9,7 +9,7 @@ import {
 import { DatabaseResult } from '../../structure/databaseResult';
 import Database, { SearchType } from '../data/Database';
 
-const collection = 'Atividade';
+export const collection = 'Atividade';
 
 export enum SituacaoAtividadeLeitura {
   aberta,
