@@ -1,12 +1,13 @@
 import { v4 as uuid } from 'uuid';
 import { Db, ClientSession } from 'mongodb';
-import { Atividade, TipoAtividade } from 'tcc-models';
-import { DatabaseResult } from '../../structure/databaseResult';
-import Database, { SearchType } from '../data/Database';
 import {
+  Atividade,
+  TipoAtividade,
   QuestaoAlternativa,
   QuestaoDissertativa,
-} from 'tcc-models/src/Atividade';
+} from 'tcc-models';
+import { DatabaseResult } from '../../structure/databaseResult';
+import Database, { SearchType } from '../data/Database';
 
 const collection = 'Atividade';
 
