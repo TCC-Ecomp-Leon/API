@@ -19,26 +19,7 @@ export const signUpNavigation = new Navigation([
     cpf: string;
   }>(
     [ProfileValidator, ValidatorCodigoDeEntrada],
-    async (userId, _profile, context, db, session) => {
-      const profile: Perfil = {
-        ..._profile,
-        id: userId,
-        entradaEm: new Date(),
-        fotoPerfil: images.imgPerfil,
-        regra: RegraPerfil.Geral,
-        associacoes: {
-          aluno: {
-            alunoParceiro: false,
-          },
-          professor: {
-            professor: false,
-          },
-        },
-        universitario: {
-          universitario: false,
-        },
-      };
-
+    async (userId, profile, context, db, session) => {
       const service: DatabaseService<NavigationResult<null>> = async (
         db,
         session
