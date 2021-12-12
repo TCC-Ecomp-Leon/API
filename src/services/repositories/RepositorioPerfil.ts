@@ -92,50 +92,52 @@ const addPerfilGeral = async (
   email: string,
   nome: string,
   telefone: number,
-  idCodigoDeEntrada: string,
+  idCodigoDeEntrada: string | undefined,
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<boolean>> => {
-  const readCodigoDeEntrada =
-    await RepositorioCodigoDeEntrada.readCodigoDeEntrada(
-      idCodigoDeEntrada,
-      db,
-      session
-    );
+  if (idCodigoDeEntrada !== undefined) {
+    const readCodigoDeEntrada =
+      await RepositorioCodigoDeEntrada.readCodigoDeEntrada(
+        idCodigoDeEntrada,
+        db,
+        session
+      );
 
-  if (!readCodigoDeEntrada.success) return readCodigoDeEntrada;
+    if (!readCodigoDeEntrada.success) return readCodigoDeEntrada;
 
-  const codigoDeEntrada = readCodigoDeEntrada.data;
-  if (codigoDeEntrada.usado) {
-    return {
-      success: true,
-      data: false,
-    };
-  }
+    const codigoDeEntrada = readCodigoDeEntrada.data;
+    if (codigoDeEntrada.usado) {
+      return {
+        success: true,
+        data: false,
+      };
+    }
 
-  //Necessário consumir o código e realizar o processo de atribuíção do novo usuário
-  //como professor ou aluno de acordo com as informações do código de entrada.
-  if (codigoDeEntrada.tipo === TipoCodigoDeEntrada.Aluno) {
-    const addAluno = await RepositorioProjeto.adicionarAlunoAoCurso(
-      codigoDeEntrada.idProjeto,
-      codigoDeEntrada.idCurso,
-      id,
-      db,
-      session
-    );
+    //Necessário consumir o código e realizar o processo de atribuíção do novo usuário
+    //como professor ou aluno de acordo com as informações do código de entrada.
+    if (codigoDeEntrada.tipo === TipoCodigoDeEntrada.Aluno) {
+      const addAluno = await RepositorioProjeto.adicionarAlunoAoCurso(
+        codigoDeEntrada.idProjeto,
+        codigoDeEntrada.idCurso,
+        id,
+        db,
+        session
+      );
 
-    if (!addAluno.success) return addAluno;
-  } else if (codigoDeEntrada.tipo === TipoCodigoDeEntrada.Professor) {
-    const addProfessor = await RepositorioProjeto.atribuirProfessorAMateria(
-      codigoDeEntrada.idProjeto,
-      codigoDeEntrada.idCurso,
-      codigoDeEntrada.idMateria,
-      id,
-      db,
-      session
-    );
+      if (!addAluno.success) return addAluno;
+    } else if (codigoDeEntrada.tipo === TipoCodigoDeEntrada.Professor) {
+      const addProfessor = await RepositorioProjeto.atribuirProfessorAMateria(
+        codigoDeEntrada.idProjeto,
+        codigoDeEntrada.idCurso,
+        codigoDeEntrada.idMateria,
+        id,
+        db,
+        session
+      );
 
-    if (!addProfessor.success) return addProfessor;
+      if (!addProfessor.success) return addProfessor;
+    }
   }
 
   const profile: TipoPerfilBanco = {

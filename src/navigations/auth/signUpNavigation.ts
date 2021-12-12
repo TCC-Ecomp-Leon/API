@@ -10,6 +10,7 @@ import {
 import { ValidatorCodigoDeEntrada } from '../../schemas/codigoEntrada';
 import RepositorioCodigoDeEntrada from '../../services/repositories/RepositorioCodigoDeEntrada';
 import RepositorioPerfil from '../../services/repositories/RepositorioPerfil';
+import RepositorioUniversitario from '../../services/repositories/RepositorioUniversitario';
 
 export const signUpNavigation = new Navigation([
   signUpHandler<{
@@ -20,32 +21,27 @@ export const signUpNavigation = new Navigation([
   }>(
     [ProfileValidator, ValidatorCodigoDeEntrada],
     async (userId, profile, context, db, session) => {
-      const service: DatabaseService<NavigationResult<null>> = async (
+      const _codigoDeEntrada = context.body['codigoDeEntrada'];
+      const codigoDeEntrada: string | undefined =
+        _codigoDeEntrada !== undefined && _codigoDeEntrada !== null
+          ? (_codigoDeEntrada as string)
+          : undefined;
+      const adicionarPerfil = await RepositorioPerfil.addPerfilGeral(
+        userId,
+        profile.email,
+        profile.nome,
+        profile.telefone,
+        codigoDeEntrada,
         db,
         session
-      ) => {
-        const codigoDeEntrada = context.body['codigoDeEntrada'] as string;
-        const adicionarPerfil = await RepositorioPerfil.addPerfilGeral(
-          userId,
-          profile.email,
-          profile.nome,
-          profile.telefone,
-          codigoDeEntrada,
-          db,
-          session
-        );
-        if (!adicionarPerfil.success) {
-          throw adicionarPerfil.error;
-        }
-        return {
-          status: 204,
-          body: null,
-        };
+      );
+      if (!adicionarPerfil.success) {
+        throw adicionarPerfil.error;
+      }
+      return {
+        success: true,
+        data: null,
       };
-
-      await withDatabaseTransaction(service);
-
-      return { success: true, data: null };
     }
   ),
 ]);

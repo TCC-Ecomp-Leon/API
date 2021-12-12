@@ -177,6 +177,7 @@ const lerAtividadesNecessitandoAprovacao = async (
 };
 
 export default {
+  emailInstitucionalValido,
   readInformacoesUniversitario,
   atualizarCurso,
   atrelarColaboracao,
