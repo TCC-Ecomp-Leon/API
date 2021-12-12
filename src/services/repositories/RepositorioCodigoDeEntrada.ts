@@ -59,12 +59,10 @@ const usarCodigoDeEntrada = (
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<null>> => {
-  //TODO: Vincular o aluno ou professor ao projeto
-  //TODO: Fazer a verificação se não já foi usado
   return Database.updatePartialData<CodigoDeEntrada>(
     collection,
     [{ key: 'id', value: id }],
-    { usado: false, usadoEm: new Date(), idPerfilUsou: idPerfil },
+    { usado: true, usadoEm: new Date(), idPerfilUsou: idPerfil },
     db,
     session
   );

@@ -12,10 +12,13 @@ import {
 
 export const signInHandler = <T>(
   getProfile: (
-    token: string,
+    userId: string,
+    email: string,
+    emailValidado: boolean,
     db: Db,
     session: ClientSession
-  ) => Promise<DatabaseResult<T | null>>
+  ) => Promise<DatabaseResult<T | null>>,
+  necessarioValirEmail: boolean = false
 ) => {
   return new Handler(
     async (
@@ -32,7 +35,11 @@ export const signInHandler = <T>(
       const email = context.body['email'] as string;
       const password = context.body['password'] as string;
 
-      const authResult = await signInWithEmailAndPassword(email, password);
+      const authResult = await signInWithEmailAndPassword(
+        email,
+        password,
+        necessarioValirEmail
+      );
       if (!authResult.success) {
         return {
           status: 401,
@@ -43,8 +50,11 @@ export const signInHandler = <T>(
       const service: DatabaseService<
         NavigationResult<{ authToken: string; profile: T }>
       > = async (db, session) => {
+        const email = context.body['email'] as string;
         const profileResult = await getProfile(
-          authResult.data.token,
+          authResult.data.userId,
+          email,
+          authResult.data.emailVerified,
           db,
           session
         );

@@ -15,9 +15,11 @@ import {
 import { ValidateFunction } from 'ajv';
 
 export const signUpHandler = <T>(
-  profileValidator: ValidateFunction<T>,
+  validators: ValidateFunction[],
   addProfile: (
+    userId: string,
     profile: T,
+    context: Context,
     db: Db,
     session: ClientSession
   ) => Promise<DatabaseResult<null>>
@@ -37,24 +39,22 @@ export const signUpHandler = <T>(
       const email = context.body['email'] as string;
       const password = context.body['password'] as string;
 
-      if (!profileValidator(context.body['profile'])) {
-        return {
-          status: 400,
-          body: {
-            error: JSON.stringify(profileValidator.errors),
-          },
-        };
+      for (let i = 0; i < validators.length; i++) {
+        const validator = validators[i];
+        if (!validator(context.body)) {
+          return {
+            status: 400,
+            body: {
+              error: JSON.stringify(validator.errors),
+            },
+          };
+        }
       }
 
       const profile = context.body['profile'] as T;
 
       const service: DatabaseService<NavigationResult<{ authToken: string }>> =
         async (db, session) => {
-          const addProfileResult = await addProfile(profile, db, session);
-          if (!addProfileResult.success) {
-            throw addProfileResult.error;
-          }
-
           const registerResult = await createAuthAccount(email, password);
           if (!registerResult.success) {
             return {
@@ -64,6 +64,17 @@ export const signUpHandler = <T>(
               },
             };
           }
+          const addProfileResult = await addProfile(
+            registerResult.data.userId,
+            profile,
+            context,
+            db,
+            session
+          );
+          if (!addProfileResult.success) {
+            throw addProfileResult.error;
+          }
+
           return {
             status: 200,
             body: {

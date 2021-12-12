@@ -1,9 +1,70 @@
+import { Perfil, RegraPerfil, InformacoesPerfil } from 'tcc-models';
 import { signUpHandler } from '../../handlers/auth/signUpHandler';
 import { ProfileValidator } from '../../schemas/profile';
-import Navigation from '../../structure/navigation';
+import Navigation, { NavigationResult } from '../../structure/navigation';
+import images from '../../../assets/images';
+import {
+  DatabaseService,
+  withDatabaseTransaction,
+} from '../../config/database';
+import { ValidatorCodigoDeEntrada } from '../../schemas/codigoEntrada';
+import RepositorioCodigoDeEntrada from '../../services/repositories/RepositorioCodigoDeEntrada';
+import RepositorioPerfil from '../../services/repositories/RepositorioPerfil';
 
 export const signUpNavigation = new Navigation([
-  signUpHandler(ProfileValidator, async (profile, db, session) => {
-    return { success: true, data: null };
-  }),
+  signUpHandler<{
+    email: string;
+    nome: string;
+    telefone: number;
+    cpf: string;
+  }>(
+    [ProfileValidator, ValidatorCodigoDeEntrada],
+    async (userId, _profile, context, db, session) => {
+      const profile: Perfil = {
+        ..._profile,
+        id: userId,
+        entradaEm: new Date(),
+        fotoPerfil: images.imgPerfil,
+        regra: RegraPerfil.Geral,
+        associacoes: {
+          aluno: {
+            alunoParceiro: false,
+          },
+          professor: {
+            professor: false,
+          },
+        },
+        universitario: {
+          universitario: false,
+        },
+      };
+
+      const service: DatabaseService<NavigationResult<null>> = async (
+        db,
+        session
+      ) => {
+        const codigoDeEntrada = context.body['codigoDeEntrada'] as string;
+        const adicionarPerfil = await RepositorioPerfil.addPerfilGeral(
+          userId,
+          profile.email,
+          profile.nome,
+          profile.telefone,
+          codigoDeEntrada,
+          db,
+          session
+        );
+        if (!adicionarPerfil.success) {
+          throw adicionarPerfil.error;
+        }
+        return {
+          status: 204,
+          body: null,
+        };
+      };
+
+      await withDatabaseTransaction(service);
+
+      return { success: true, data: null };
+    }
+  ),
 ]);
