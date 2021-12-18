@@ -5,7 +5,8 @@ import {
   DatabaseService,
   withDatabaseTransaction,
 } from '../../config/database';
-import Database from '../data/Database';
+
+jest.setTimeout(10000);
 
 test('Criação e leitura de um projeto', async () => {
   const nomeProjeto = 'Projeto test';
