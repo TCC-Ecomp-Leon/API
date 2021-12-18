@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import { Db, ClientSession } from 'mongodb';
-import { CursoUniversitario } from 'tcc-models';
+import { CursoUniversitario } from '../../models';
 import { DatabaseResult } from '../../structure/databaseResult';
 import Database from '../data/Database';
 

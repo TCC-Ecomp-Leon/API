@@ -5,7 +5,7 @@ import {
   CursoUniversitario,
   InformacoesUniversitarioAprovado,
   InformacoesUniversitario,
-} from 'tcc-models';
+} from '../../models';
 import { DatabaseResult } from '../../structure/databaseResult';
 import Database from '../data/Database';
 

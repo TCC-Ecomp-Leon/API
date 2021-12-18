@@ -1,6 +1,10 @@
 import { v4 as uuid } from 'uuid';
 import { Db, ClientSession } from 'mongodb';
-import { Atividade, BancoDeQuestoes, QuestaoBancoDeQuestoes } from 'tcc-models';
+import {
+  Atividade,
+  BancoDeQuestoes,
+  QuestaoBancoDeQuestoes,
+} from '../../models';
 import { DatabaseResult } from '../../structure/databaseResult';
 import Database, { SearchType } from '../data/Database';
 import RepositorioAtividade from './RepositorioAtividade';

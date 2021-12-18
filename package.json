@@ -40,7 +40,6 @@
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
     "mongodb": "^4.1.3",
-    "tcc-models": "git+ssh://git@github.com/TCC-Ecomp-Leon/Models.git#feature/alteraracoes-documentos",
     "ts-node-dev": "^1.1.6",
     "uuid": "^8.3.2"
   }

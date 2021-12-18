@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import { Db, ClientSession } from 'mongodb';
-import { Perfil, RegraPerfil, TipoCodigoDeEntrada } from 'tcc-models';
+import { Perfil, RegraPerfil, TipoCodigoDeEntrada } from '../../models';
 import { DatabaseResult } from '../../structure/databaseResult';
 import Database from '../data/Database';
 import RepositorioProjeto from './RepositorioProjeto';

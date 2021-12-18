@@ -5,7 +5,7 @@ import {
   TipoAtividade,
   QuestaoAlternativa,
   QuestaoDissertativa,
-} from 'tcc-models';
+} from '../../models';
 import { DatabaseResult } from '../../structure/databaseResult';
 import Database, { SearchType } from '../data/Database';
 

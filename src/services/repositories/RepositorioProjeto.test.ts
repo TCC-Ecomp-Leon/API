@@ -1,5 +1,5 @@
 import RepositorioProjeto from './RepositorioProjeto';
-import { Projeto, Curso, Materia, Endereco } from 'tcc-models';
+import { Projeto, Curso, Materia, Endereco } from '../../models';
 import { v4 as uuid } from 'uuid';
 import {
   DatabaseService,

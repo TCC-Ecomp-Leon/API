@@ -1,5 +1,5 @@
 import Ajv, { JSONSchemaType } from 'ajv';
-import { InformacoesPerfil } from 'tcc-models';
+import { InformacoesPerfil } from '../models';
 const ajv = new Ajv();
 
 const profile: JSONSchemaType<{

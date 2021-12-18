@@ -14,7 +14,7 @@ import {
   QuestaoAlternativa,
   AvaliacaoRespostaBancoDeQuestoes,
   BancoDeQuestoes,
-} from 'tcc-models';
+} from '../../models';
 import { DatabaseResult } from '../../structure/databaseResult';
 import Database, { SearchType } from '../data/Database';
 import RepositorioAtividade from './RepositorioAtividade';
