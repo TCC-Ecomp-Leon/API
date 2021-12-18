@@ -2,7 +2,7 @@ import { Perfil, RegraPerfil, InformacoesPerfil } from '../../models';
 import { signUpHandler } from '../../handlers/auth/signUpHandler';
 import { ProfileValidator } from '../../schemas/profile';
 import Navigation, { NavigationResult } from '../../structure/navigation';
-import images from '../../../assets/images';
+import images from '../../assets/images';
 import {
   DatabaseService,
   withDatabaseTransaction,
