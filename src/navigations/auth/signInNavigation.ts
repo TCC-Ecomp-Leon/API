@@ -17,10 +17,7 @@ export const signInNavigation = new Navigation([
 
     return {
       success: true,
-      data: {
-        status: 200,
-        body: profile.data,
-      },
+      data: profile.data,
     };
   }),
 ]);
