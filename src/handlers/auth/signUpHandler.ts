@@ -20,6 +20,7 @@ export const signUpHandler = <T>(
     activationFunction: (body: any) => boolean;
     validator: ValidateFunction;
   }[],
+  mountProfile: (body: any) => T,
   addProfile: (
     userId: string,
     profile: T,
@@ -32,7 +33,7 @@ export const signUpHandler = <T>(
     async (
       context: Context
     ): Promise<NavigationResult<{ authToken: string }>> => {
-      if (!LoginValidator(context.body as object)) {
+      if (!LoginValidator(context.body)) {
         return {
           status: 400,
           body: {
@@ -71,7 +72,7 @@ export const signUpHandler = <T>(
         }
       }
 
-      const profile = context.body['profile'] as T;
+      const profile = mountProfile(context.body);
 
       const service: DatabaseService<NavigationResult<{ authToken: string }>> =
         async (db, session) => {

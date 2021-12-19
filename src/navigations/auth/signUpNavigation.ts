@@ -29,6 +29,14 @@ export const signUpNavigation = new Navigation([
         validator: ValidatorCodigoDeEntrada,
       },
     ],
+    (body) => {
+      return {
+        email: body.email,
+        nome: body.nome,
+        cpf: body.cpf,
+        telefone: body.telefone,
+      };
+    },
     async (userId, profile, context, db, session) => {
       const _codigoDeEntrada = context.body['codigoDeEntrada'];
       const codigoDeEntrada: string | undefined =
