@@ -1,11 +1,37 @@
 import request from 'supertest';
 import app from '../src/app';
+import { backtrackObject } from './utils';
 
 const endpoint = '/auth/sign/';
 
-test('', async () => {
-  const result = await request(app).post(endpoint);
+const camposObrigatorios: {
+  email: string;
+  nome: string;
+  telefone: number;
+  cpf: string;
+} = {
+  email: 'test@test.com',
+  nome: 'test',
+  telefone: 12999999999,
+  cpf: 'xxxxxxxx',
+};
 
-  console.log(result.statusCode);
-  console.log(result.body);
+const camposOpcionais: { codigoDeEntrada: string } = {
+  codigoDeEntrada: 'XXXXX',
+};
+
+test('Passagem de parâmetros errados para o endpoint de registro', async () => {
+  const opcoesComErros = backtrackObject(camposObrigatorios, true, false);
+
+  for (let i = 0; i < opcoesComErros.length; i++) {
+    const result1 = await request(app).post(endpoint).send(opcoesComErros[i]);
+
+    expect(result1.statusCode).toBe(400);
+
+    const result2 = await request(app)
+      .post(endpoint)
+      .send({ ...opcoesComErros[i], ...camposOpcionais });
+
+    expect(result2.statusCode).toBe(400);
+  }
 });

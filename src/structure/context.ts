@@ -23,7 +23,6 @@ export default class Context {
       throw Error('Invalid http method');
     this.params = { ...req.params, ...req.query };
     this._variables = new Object();
-    console.log(this);
   }
 
   setVariable<T>(key: string, variable: T) {
