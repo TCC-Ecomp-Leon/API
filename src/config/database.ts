@@ -169,4 +169,4 @@ export const withDatabaseTransaction = async <T>(
 /**
  * Timeout for the write operations in the mongodb cluster.
  */
-const wTimeOut = 100;
+const wTimeOut = 1000;
