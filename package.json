@@ -6,7 +6,7 @@
   "scripts": {
     "start": "ts-node-dev src/index.ts",
     "pretest": "ENV='TEST' node tests_e2e/test_database.js",
-    "test": "jest"
+    "test": "ENV='TEST' jest"
   },
   "jest": {
     "preset": "ts-jest",
