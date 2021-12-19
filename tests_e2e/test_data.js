@@ -1,5 +1,6 @@
 const mongoDb = require("mongodb");
 const dotenv = require("dotenv");
+const fs = require('fs');
 
 function initEnv() {
   const options = {
@@ -41,6 +42,28 @@ function initEnv() {
   }
 }
 
+const localUsersFile = () => {
+  const env = process.env.ENV;
+  if (env !== 'LOCAL' && env !== 'TEST')
+    if (env !== 'PROD' && env !== 'BETA')
+      throw Error('Wrong usage of offline firebase auth');
+  if (env === 'LOCAL') return './.localAuth.json';
+  else return './.localAuth.test.json';
+};
+
+const resetAuthData = async (
+) => {
+  try {
+    fs.writeFileSync(localUsersFile(), JSON.stringify([]), {
+      encoding: 'utf8',
+    });
+
+    return { success: true, data: null };
+  } catch (e) {
+    return { success: false, error: e };
+  }
+};
+
 initEnv();
 
 const client = new mongoDb.MongoClient(process.env.MONGODB_URL, {
@@ -55,5 +78,9 @@ client
   .then(() => {});
 
 console.log('dropped database');
+
+resetAuthData().then(() => {});
+
+console.log('dropped auth data');
 
 process.exit();
