@@ -1,5 +1,6 @@
 import {
   createAuthAccount,
+  deleteAccount,
   signInWithEmailAndPassword,
 } from '../../services/authentification/firebaseAuth';
 import Context from '../../structure/context';
@@ -33,34 +34,22 @@ export const signUpHandler = <T>(
     async (
       context: Context
     ): Promise<NavigationResult<{ authToken: string }>> => {
-      if (!LoginValidator(context.body)) {
-        return {
-          status: 400,
-          body: {
-            error: JSON.stringify(LoginValidator.errors),
-          },
-        };
-      }
-      const email = context.body['email'] as string;
-      const password = context.body['password'] as string;
+      let userToken: string | undefined = undefined;
 
-      for (let i = 0; i < validators.length; i++) {
-        const validator = validators[i];
-        if (!validator(context.body)) {
+      try {
+        if (!LoginValidator(context.body)) {
           return {
             status: 400,
             body: {
-              error: JSON.stringify(validator.errors),
+              error: JSON.stringify(LoginValidator.errors),
             },
           };
         }
-      }
+        const email = context.body['email'] as string;
+        const password = context.body['password'] as string;
 
-      for (let i = 0; i < customValidators.length; i++) {
-        const activation = customValidators[i].activationFunction(context.body);
-
-        if (activation) {
-          const validator = customValidators[i].validator;
+        for (let i = 0; i < validators.length; i++) {
+          const validator = validators[i];
           if (!validator(context.body)) {
             return {
               status: 400,
@@ -70,12 +59,30 @@ export const signUpHandler = <T>(
             };
           }
         }
-      }
 
-      const profile = mountProfile(context.body);
+        for (let i = 0; i < customValidators.length; i++) {
+          const activation = customValidators[i].activationFunction(
+            context.body
+          );
 
-      const service: DatabaseService<NavigationResult<{ authToken: string }>> =
-        async (db, session) => {
+          if (activation) {
+            const validator = customValidators[i].validator;
+            if (!validator(context.body)) {
+              return {
+                status: 400,
+                body: {
+                  error: JSON.stringify(validator.errors),
+                },
+              };
+            }
+          }
+        }
+
+        const profile = mountProfile(context.body);
+
+        const service: DatabaseService<
+          NavigationResult<{ authToken: string }>
+        > = async (db, session) => {
           const registerResult = await createAuthAccount(email, password);
           if (!registerResult.success) {
             return {
@@ -85,6 +92,9 @@ export const signUpHandler = <T>(
               },
             };
           }
+
+          userToken = registerResult.data.token;
+
           const addProfileResult = await addProfile(
             registerResult.data.userId,
             profile,
@@ -104,7 +114,14 @@ export const signUpHandler = <T>(
           };
         };
 
-      return await withDatabaseTransaction(service);
+        return await withDatabaseTransaction(service);
+      } catch (e) {
+        if (userToken !== undefined) {
+          await deleteAccount(userToken);
+        }
+
+        throw e;
+      }
     }
   );
 };

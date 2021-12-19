@@ -37,3 +37,15 @@ test('Passagem de parâmetros errados para o endpoint de registro', async () => 
     expect(result2.statusCode).toBe(400);
   }
 });
+
+test('Uso correto do endpoint de signUp sem código de registro', async () => {
+  const result = await request(app).post(endpoint).send(camposObrigatorios);
+
+  expect(result.statusCode).toBe(200);
+});
+
+test('Tentativa de registrar um usuário novamente', async () => {
+  const result = await request(app).post(endpoint).send(camposObrigatorios);
+
+  expect(result.statusCode).toBeGreaterThanOrEqual(400);
+});
