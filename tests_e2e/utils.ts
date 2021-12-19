@@ -27,10 +27,14 @@ export const backtrackObject = (
   const ret: any[] = [];
 
   fieldPossibilities.forEach((possibility) => {
-    if (possibility.length === 0 && considerEmpty) {
-      ret.push({});
-    } else if (possibility.length === keys.length && considerFull) {
-      ret.push(obj);
+    if (possibility.length === 0) {
+      if (considerEmpty) {
+        ret.push({});
+      }
+    } else if (possibility.length === keys.length) {
+      if (considerFull) {
+        ret.push(obj);
+      }
     } else {
       let mountObject: any = {};
 
