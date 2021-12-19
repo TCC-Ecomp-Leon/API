@@ -4,7 +4,14 @@ import fs from 'fs';
 import { v4 as uuid } from 'uuid';
 import environmentVariables from '../../../config/environmentVariables';
 
-const localUsersFile = './.localAuth.json';
+const localUsersFile = () => {
+  const env = environmentVariables();
+  if (env.ENV !== 'LOCAL' && env.ENV !== 'TEST')
+    if (env.ENV !== 'PROD' && env.ENV !== 'BETA')
+      throw Error('Wrong usage of offline firebase auth');
+  if (env.ENV === 'LOCAL') return './.localAuth.json';
+  else return './.localAuth.test.json';
+};
 
 type User = {
   email: string;
@@ -15,10 +22,12 @@ type User = {
 
 const readLocalUsers = async (): Promise<DatabaseResult<Array<User>>> => {
   try {
-    if (!fs.existsSync(localUsersFile)) {
+    if (!fs.existsSync(localUsersFile())) {
       return { success: true, data: [] };
     }
-    const read = fs.readFileSync(localUsersFile, { encoding: 'utf8' });
+    const read = fs.readFileSync(localUsersFile(), { encoding: 'utf8' });
+
+    if (read.length === 0) return { success: true, data: [] };
 
     return { success: true, data: JSON.parse(read) as Array<User> };
   } catch (e) {
@@ -30,7 +39,7 @@ const writeLocalUsers = async (
   users: Array<User>
 ): Promise<DatabaseResult<null>> => {
   try {
-    fs.writeFileSync(localUsersFile, JSON.stringify(users), {
+    fs.writeFileSync(localUsersFile(), JSON.stringify(users), {
       encoding: 'utf8',
     });
 
@@ -46,7 +55,8 @@ const createAuthAccount = async (
 ): Promise<DatabaseResult<{ token: string; userId: string }>> => {
   try {
     const env = environmentVariables();
-    if (env.ENV !== 'LOCAL') throw Error('Wrong usage of local firebase auth');
+    if (env.ENV !== 'LOCAL' && env.ENV !== 'TEST')
+      throw Error('Wrong usage of local firebase auth');
 
     if (email.length < 1 || password.length < 1)
       return { success: false, error: Error('Invalid password or email') };
@@ -178,7 +188,8 @@ const signInWithEmailAndPassword = async (
 > => {
   try {
     const env = environmentVariables();
-    if (env.ENV !== 'LOCAL') throw Error('Wrong usage of local firebase auth');
+    if (env.ENV !== 'LOCAL' && env.ENV !== 'TEST')
+      throw Error('Wrong usage of local firebase auth');
 
     if (email.length < 1 || password.length < 1)
       return { success: false, error: Error('Invalid password or email') };
@@ -232,7 +243,8 @@ const updateEmailAndPassword = async (
 ): Promise<DatabaseResult<{ token: string; userId: string }>> => {
   try {
     const env = environmentVariables();
-    if (env.ENV !== 'LOCAL') throw Error('Wrong usage of local firebase auth');
+    if (env.ENV !== 'LOCAL' && env.ENV !== 'TEST')
+      throw Error('Wrong usage of local firebase auth');
 
     if (email.length < 1 || password.length < 1)
       return { success: false, error: Error('Invalid password or email') };

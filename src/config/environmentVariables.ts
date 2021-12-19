@@ -16,7 +16,7 @@ type EnvirontmentVariables =
       FIREBASE_MEASUREMENT_ID: string;
     }
   | {
-      ENV: 'LOCAL';
+      ENV: 'LOCAL' | 'TEST';
       JWT_SECRET: string;
       MONGODB_URL: string;
     };
@@ -35,7 +35,7 @@ type _EnvirontmentVariables =
       FIREBASE_MEASUREMENT_ID: string | undefined;
     }
   | {
-      ENV: 'LOCAL' | undefined;
+      ENV: 'LOCAL' | 'TEST' | undefined;
       JWT_SECRET: string | undefined;
       MONGODB_URL: string | undefined;
     };
@@ -46,7 +46,7 @@ export default function (): EnvirontmentVariables {
     _initEnv = true;
   }
   let envVariables: _EnvirontmentVariables;
-  if (process.env.ENV === 'LOCAL') {
+  if (process.env.ENV === 'LOCAL' || process.env.ENV === 'TEST') {
     envVariables = {
       ENV: process.env.ENV,
       JWT_SECRET: process.env.JWT_SECRET,
@@ -85,6 +85,7 @@ export default function (): EnvirontmentVariables {
 function initEnv(): void {
   const options = {
     local: process.env.ENV === undefined || process.env.ENV === 'LOCAL',
+    test: process.env.ENV === 'TEST',
     beta: process.env.ENV === 'BETA',
     prod: process.env.ENV === 'PROD',
   };
@@ -104,6 +105,13 @@ function initEnv(): void {
      */
     dotenv.config({ path: '.env.beta' });
     process.env.ENV = 'BETA';
+  } else if (options.test) {
+    /**
+     * The local environment using the local firebase emulation and
+     * the local mongodb database for test
+     */
+    dotenv.config({ path: '.env.test' });
+    process.env.ENV = 'TEST';
   } else {
     /**
      * The local environment using the local firebase emulation and

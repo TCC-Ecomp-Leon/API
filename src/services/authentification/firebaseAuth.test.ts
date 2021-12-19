@@ -62,7 +62,10 @@ test('create an account + revoke token + check token + verification email + rese
   ).toBe(true);
   if (!signInResult.success) throw signInResult.error;
 
-  if (environmentVariables().ENV === 'LOCAL') {
+  if (
+    environmentVariables().ENV === 'LOCAL' ||
+    environmentVariables().ENV === 'TEST'
+  ) {
     await expect(requestResetPassword(testEmail)).rejects.toThrow();
   } else {
     const requestResetPasswordResult = await requestResetPassword(testEmail);
