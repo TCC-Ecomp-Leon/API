@@ -19,7 +19,16 @@ export const signUpNavigation = new Navigation([
     telefone: number;
     cpf: string;
   }>(
-    [ProfileValidator, ValidatorCodigoDeEntrada],
+    [ProfileValidator],
+    [
+      {
+        activationFunction: (body) => {
+          const codigoDeEntrada = body['codigoDeEntrada'];
+          return codigoDeEntrada !== undefined;
+        },
+        validator: ValidatorCodigoDeEntrada,
+      },
+    ],
     async (userId, profile, context, db, session) => {
       const _codigoDeEntrada = context.body['codigoDeEntrada'];
       const codigoDeEntrada: string | undefined =

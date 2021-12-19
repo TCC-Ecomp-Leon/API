@@ -16,6 +16,10 @@ import { ValidateFunction } from 'ajv';
 
 export const signUpHandler = <T>(
   validators: ValidateFunction[],
+  customValidators: {
+    activationFunction: (body: any) => boolean;
+    validator: ValidateFunction;
+  }[],
   addProfile: (
     userId: string,
     profile: T,
@@ -48,6 +52,22 @@ export const signUpHandler = <T>(
               error: JSON.stringify(validator.errors),
             },
           };
+        }
+      }
+
+      for (let i = 0; i < customValidators.length; i++) {
+        const activation = customValidators[i].activationFunction(context.body);
+
+        if (activation) {
+          const validator = customValidators[i].validator;
+          if (!validator(context.body)) {
+            return {
+              status: 400,
+              body: {
+                error: JSON.stringify(validator.errors),
+              },
+            };
+          }
         }
       }
 
