@@ -6,11 +6,13 @@ const endpoint = '/auth/sign/';
 
 const camposObrigatorios: {
   email: string;
+  password: string;
   nome: string;
   telefone: number;
   cpf: string;
 } = {
   email: 'test@test.com',
+  password: 'test@test',
   nome: 'test',
   telefone: 12999999999,
   cpf: 'xxxxxxxx',
