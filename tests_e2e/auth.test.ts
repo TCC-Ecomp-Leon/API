@@ -6,6 +6,9 @@ import assets from '../src/assets/images';
 
 const endpoint = '/auth/sign/';
 
+let loginToken: string | undefined = undefined;
+let perfilRegistrado: Perfil | undefined = undefined;
+
 const camposObrigatorios: {
   email: string;
   password: string;
@@ -85,4 +88,18 @@ test('Tentativa de entrar com o usuário e senha registrados', async () => {
   expect(perfil.associacoes.aluno.alunoParceiro).toStrictEqual(false);
   expect(perfil.associacoes.professor.professor).toStrictEqual(false);
   expect(perfil.universitario.universitario).toStrictEqual(false);
+
+  loginToken = result.body['authToken'];
+  perfilRegistrado = perfil;
+});
+
+test('Obtenção de perfil usando o token da requisição de login', async () => {
+  const result = await request(app)
+    .get(endpoint)
+    .set(`Authorization`, `Bearer ${loginToken}`);
+
+  expect(result.statusCode).toStrictEqual(200);
+
+  const perfil = result.body['profile'] as Perfil;
+  expect(perfil).toStrictEqual(perfilRegistrado);
 });
