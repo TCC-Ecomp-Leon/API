@@ -9,3 +9,7 @@ node_modules
 dist
 
 .localAuth.json
+
+.localAuth.test.json
+
+docker/

@@ -10,7 +10,9 @@ import {
 } from 'mongodb';
 import environmentVariables from './environmentVariables';
 
-const client = new MongoClient(environmentVariables().MONGODB_URL);
+const client = new MongoClient(environmentVariables().MONGODB_URL, {
+  ignoreUndefined: true,
+});
 
 export type DatabaseService<T> = (db: Db, session: ClientSession) => Promise<T>;
 
@@ -153,8 +155,8 @@ export const withDatabaseTransaction = async <T>(
         resolve(result);
       }, transactionOptions);
     } catch (e) {
-      console.warn('MONGODB ERROR');
-      console.warn(e);
+      // console.warn('MONGODB ERROR');
+      // console.warn(e);
       await session.endSession();
       await client.close();
       reject(e);
@@ -167,4 +169,4 @@ export const withDatabaseTransaction = async <T>(
 /**
  * Timeout for the write operations in the mongodb cluster.
  */
-const wTimeOut = 100;
+const wTimeOut = 1000;

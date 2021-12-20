@@ -7,7 +7,10 @@ export const createAuthAccount = async (
   email: string,
   password: string
 ): Promise<DatabaseResult<{ token: string; userId: string }>> => {
-  if (environmentVariables().ENV === 'LOCAL') {
+  if (
+    environmentVariables().ENV === 'LOCAL' ||
+    environmentVariables().ENV === 'TEST'
+  ) {
     return await localAuth.createAuthAccount(email, password);
   } else {
     return await onlineAuth.createAuthAccount(email, password);
@@ -22,7 +25,10 @@ export const checkLoginToken = async (
     email: string;
   }>
 > => {
-  if (environmentVariables().ENV === 'LOCAL') {
+  if (
+    environmentVariables().ENV === 'LOCAL' ||
+    environmentVariables().ENV === 'TEST'
+  ) {
     return await localAuth.checkLoginToken(token);
   } else {
     return await onlineAuth.checkLoginToken(token);
@@ -32,7 +38,10 @@ export const checkLoginToken = async (
 export const signOutAllAcounts = async (
   token: string
 ): Promise<DatabaseResult<null>> => {
-  if (environmentVariables().ENV === 'LOCAL') {
+  if (
+    environmentVariables().ENV === 'LOCAL' ||
+    environmentVariables().ENV === 'TEST'
+  ) {
     return await localAuth.signOutAllAcounts(token);
   } else {
     return await onlineAuth.signOutAllAcounts(token);
@@ -46,7 +55,10 @@ export const signInWithEmailAndPassword = async (
 ): Promise<
   DatabaseResult<{ token: string; userId: string; emailVerified: boolean }>
 > => {
-  if (environmentVariables().ENV === 'LOCAL') {
+  if (
+    environmentVariables().ENV === 'LOCAL' ||
+    environmentVariables().ENV === 'TEST'
+  ) {
     return await localAuth.signInWithEmailAndPassword(
       email,
       password,
@@ -66,7 +78,10 @@ export const updateEmailAndPassword = async (
   email: string,
   password: string
 ): Promise<DatabaseResult<{ token: string; userId: string }>> => {
-  if (environmentVariables().ENV === 'LOCAL') {
+  if (
+    environmentVariables().ENV === 'LOCAL' ||
+    environmentVariables().ENV === 'TEST'
+  ) {
     return await localAuth.updateEmailAndPassword(token, email, password);
   } else {
     return await onlineAuth.updateEmailAndPassword(token, email, password);
@@ -76,7 +91,10 @@ export const updateEmailAndPassword = async (
 export const deleteAccount = async (
   token: string
 ): Promise<DatabaseResult<null>> => {
-  if (environmentVariables().ENV === 'LOCAL') {
+  if (
+    environmentVariables().ENV === 'LOCAL' ||
+    environmentVariables().ENV === 'TEST'
+  ) {
     return await localAuth.deleteAccount(token);
   } else {
     return await onlineAuth.deleteAccount(token);
@@ -86,7 +104,10 @@ export const deleteAccount = async (
 export const requestResetPassword = async (
   email: string
 ): Promise<DatabaseResult<null>> => {
-  if (environmentVariables().ENV === 'LOCAL') {
+  if (
+    environmentVariables().ENV === 'LOCAL' ||
+    environmentVariables().ENV === 'TEST'
+  ) {
     throw Error(
       "Can't use request reset password in the local firebase implementation"
     );

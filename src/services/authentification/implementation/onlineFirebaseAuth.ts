@@ -16,7 +16,8 @@ const getFirebaseReference = (): {
   if (db === undefined || auth === undefined || adminAuth === undefined) {
     const env = environmentVariables();
 
-    if (env.ENV === 'LOCAL') throw Error('Wrong usage of online firebase auth');
+    if (env.ENV !== 'PROD' && env.ENV !== 'BETA')
+      throw Error('Wrong usage of online firebase auth');
 
     const serviceAccount =
       env.ENV === 'PROD'

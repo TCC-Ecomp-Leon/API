@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "rootDir": "src",
     "outDir": "./dist",
     "module": "commonjs",
     "target": "es2019",
@@ -9,5 +10,7 @@
     "resolveJsonModule": true,
     "strict": true,
     "sourceMap": true
-  }
+  },
+  "include": ["src/**/*.ts", "src/**.*.htm"],
+  "exclude": ["node_modules"]
 }

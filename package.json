@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "ts-node-dev src/index.ts",
-    "test": "jest"
+    "pretest": "ENV='TEST' node tests_e2e/test_data.js",
+    "test": "ENV='TEST' jest"
   },
   "jest": {
     "preset": "ts-jest",
@@ -19,8 +20,10 @@
   "devDependencies": {
     "@types/jest": "^27.0.1",
     "@types/node": "^14.0.27",
+    "@types/supertest": "^2.0.11",
     "jest": "^27.1.0",
     "prettier": "^2.2.1",
+    "supertest": "^6.1.6",
     "ts-jest": "^27.0.5",
     "typescript": "^3.9.7"
   },
@@ -40,7 +43,6 @@
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
     "mongodb": "^4.1.3",
-    "tcc-models": "git+ssh://git@github.com/TCC-Ecomp-Leon/Models.git#v0.0.1",
     "ts-node-dev": "^1.1.6",
     "uuid": "^8.3.2"
   }

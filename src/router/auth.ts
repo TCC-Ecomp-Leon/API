@@ -5,5 +5,6 @@ export const router = express.Router();
 
 const authController = new AuthController();
 
-router.post('/auth/sign-in', authController.signIn.bind(authController));
-router.get('/auth/sign-up', authController.signUp.bind(authController));
+router.put('/auth/sign', authController.signIn.bind(authController));
+router.post('/auth/sign', authController.signUp.bind(authController));
+router.get('/auth/sign', authController.tokenGetProfile.bind(authController));
