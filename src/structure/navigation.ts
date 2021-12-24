@@ -27,7 +27,7 @@ export default class Navigation {
       }
     | {
         success: false;
-        error: Error;
+        error: unknown;
       }
   > {
     for (let i = 0; i < this.handlers.length; i++) {
