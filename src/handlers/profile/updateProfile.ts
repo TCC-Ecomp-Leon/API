@@ -28,6 +28,9 @@ export const updateProfileHandler = new Handler(
       if (updatingProfile.entradaEm !== undefined) {
         delete updatingProfile.entradaEm;
       }
+      if (updatingProfile.id !== undefined) {
+        delete updatingProfile.id;
+      }
 
       const result = await RepositorioPerfil.atualizarPerfil(
         userProfile.id,

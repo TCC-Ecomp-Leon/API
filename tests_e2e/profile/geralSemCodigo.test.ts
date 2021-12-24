@@ -36,7 +36,7 @@ beforeAll(async () => {
   }
 
   loginToken = authResult.body['authToken'];
-  perfil = result.body['profile'] as Perfil;
+  perfil = authResult.body['profile'] as Perfil;
 });
 
 afterAll(async () => {
