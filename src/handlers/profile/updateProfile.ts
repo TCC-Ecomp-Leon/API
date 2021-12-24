@@ -22,6 +22,13 @@ export const updateProfileHandler = new Handler(
       if (userProfile.regra !== RegraPerfil.Geral) {
         delete updatingProfile.cpf;
       }
+      if (updatingProfile.email !== undefined) {
+        delete updatingProfile.email;
+      }
+      if (updatingProfile.entradaEm !== undefined) {
+        delete updatingProfile.entradaEm;
+      }
+
       const result = await RepositorioPerfil.atualizarPerfil(
         userProfile.id,
         updatingProfile,

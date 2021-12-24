@@ -26,9 +26,7 @@ const profile: JSONSchemaType<{
 };
 
 const updateProfile: JSONSchemaType<
-  Partial<Omit<InformacoesPerfil, 'id' | 'entradaEm'>> & {
-    regra: RegraPerfil;
-  } & { cpf?: string }
+  Partial<Omit<InformacoesPerfil, 'id' | 'entradaEm'>> & { cpf?: string }
 > = {
   type: 'object',
   properties: {
@@ -37,9 +35,8 @@ const updateProfile: JSONSchemaType<
     telefone: { type: 'integer', nullable: true },
     fotoPerfil: { type: 'string', nullable: true },
     cpf: { type: 'string', nullable: true },
-    regra: { type: 'integer' },
   },
-  required: ['regra'],
+  required: [],
   additionalProperties: true,
 };
 
