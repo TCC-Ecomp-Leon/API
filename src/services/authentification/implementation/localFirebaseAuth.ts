@@ -334,6 +334,31 @@ const deleteAccount = async (token: string): Promise<DatabaseResult<null>> => {
   }
 };
 
+const readAuthProfile = async (
+  id: string
+): Promise<DatabaseResult<{ email: string; emailVerified: boolean }>> => {
+  const readUsers = await readLocalUsers();
+  if (!readUsers.success) {
+    return { success: false, error: readUsers.error };
+  }
+
+  const find = readUsers.data.find((user) => user.userId === id);
+  if (find === undefined) {
+    return {
+      success: false,
+      error: Error("That user doesn't have an account"),
+    };
+  }
+
+  return {
+    success: true,
+    data: {
+      email: find.email,
+      emailVerified: false,
+    },
+  };
+};
+
 export default {
   createAuthAccount,
   checkLoginToken,
@@ -341,4 +366,5 @@ export default {
   signInWithEmailAndPassword,
   updateEmailAndPassword,
   deleteAccount,
+  readAuthProfile,
 };

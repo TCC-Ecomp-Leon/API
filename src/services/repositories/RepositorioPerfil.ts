@@ -1,6 +1,11 @@
 import { v4 as uuid } from 'uuid';
 import { Db, ClientSession } from 'mongodb';
-import { Perfil, RegraPerfil, TipoCodigoDeEntrada } from '../../models';
+import {
+  InformacoesPerfil,
+  Perfil,
+  RegraPerfil,
+  TipoCodigoDeEntrada,
+} from '../../models';
 import { DatabaseResult } from '../../structure/databaseResult';
 import Database from '../data/Database';
 import RepositorioProjeto from './RepositorioProjeto';
@@ -251,19 +256,35 @@ const readPerfil = async (
   };
 };
 
-const atualizarFotoPerfil = (
+const atualizarPerfil = (
   idPerfil: string,
-  imagem: string,
+  info: Partial<Omit<InformacoesPerfil, 'id' | 'entradaEm'>> & {
+    regra: RegraPerfil;
+  } & { cpf?: string },
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<null>> => {
   const identificadorPerfil: keyof Perfil = 'id';
-  const campoImagem: keyof Perfil = 'fotoPerfil';
 
-  return Database.updateGenericData(
+  return Database.updatePartialData(
     collection,
     [{ key: identificadorPerfil, value: idPerfil }],
-    [{ key: campoImagem, value: imagem }],
+    info,
+    db,
+    session
+  );
+};
+
+const deletarPerfil = (
+  idPerfil: string,
+  db: Db,
+  session: ClientSession
+): Promise<DatabaseResult<null>> => {
+  const identificadorPerfil: keyof Perfil = 'id';
+
+  return Database.remove(
+    collection,
+    [{ key: identificadorPerfil, value: idPerfil }],
     db,
     session
   );
@@ -274,7 +295,8 @@ export default {
   addPerfilProjeto,
   addPerfilGeral,
   readPerfil,
-  atualizarFotoPerfil,
+  atualizarPerfil,
+  deletarPerfil,
 };
 
 const defaultProfileImage = assets.imgPerfil;

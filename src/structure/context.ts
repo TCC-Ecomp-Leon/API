@@ -9,7 +9,7 @@ export default class Context {
   body: Record<string, any>;
   header: IncomingHttpHeaders;
   method: Method;
-  params: object;
+  params: Record<string, any>;
 
   _variables: { [key: string]: any };
 

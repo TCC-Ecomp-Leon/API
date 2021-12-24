@@ -93,13 +93,13 @@ test('Tentativa de entrar com o usuário e senha registrados', async () => {
   perfilRegistrado = perfil;
 });
 
-test('Obtenção de perfil usando o token da requisição de login', async () => {
-  const result = await request(app)
-    .get(endpoint)
-    .set(`Authorization`, `Bearer ${loginToken}`);
+// test('Obtenção de perfil usando o token da requisição de login', async () => {
+//   const result = await request(app)
+//     .get(endpoint)
+//     .set(`Authorization`, `Bearer ${loginToken}`);
 
-  expect(result.statusCode).toStrictEqual(200);
+//   expect(result.statusCode).toStrictEqual(200);
 
-  const perfil = result.body['profile'] as Perfil;
-  expect(perfil).toStrictEqual(perfilRegistrado);
-});
+//   const perfil = result.body['profile'] as Perfil;
+//   expect(perfil).toStrictEqual(perfilRegistrado);
+// });

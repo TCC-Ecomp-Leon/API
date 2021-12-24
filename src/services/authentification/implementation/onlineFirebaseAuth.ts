@@ -230,6 +230,34 @@ const requestResetPassword = async (
   }
 };
 
+const readAuthProfile = async (
+  id: string
+): Promise<DatabaseResult<{ email: string; emailVerified: boolean }>> => {
+  try {
+    const { auth, adminAuth } = getFirebaseReference();
+
+    const user = await adminAuth.getUser(id);
+    if (user.email === undefined) {
+      return {
+        success: false,
+        error: Error('User without email'),
+      };
+    }
+    return {
+      success: true,
+      data: {
+        email: user.email,
+        emailVerified: user.emailVerified,
+      },
+    };
+  } catch (e) {
+    return {
+      success: false,
+      error: e as Error,
+    };
+  }
+};
+
 export default {
   createAuthAccount,
   checkLoginToken,
@@ -238,4 +266,5 @@ export default {
   updateEmailAndPassword,
   deleteAccount,
   requestResetPassword,
+  readAuthProfile,
 };
