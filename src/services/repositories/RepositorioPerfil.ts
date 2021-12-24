@@ -258,9 +258,7 @@ const readPerfil = async (
 
 const atualizarPerfil = (
   idPerfil: string,
-  info: Partial<Omit<InformacoesPerfil, 'id' | 'entradaEm'>> & {
-    regra: RegraPerfil;
-  } & { cpf?: string },
+  info: Omit<Partial<Perfil>, 'associacoes' | 'universitario'>,
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<null>> => {
