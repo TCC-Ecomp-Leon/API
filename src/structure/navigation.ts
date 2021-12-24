@@ -41,7 +41,7 @@ export default class Navigation {
       } catch (e) {
         return {
           success: false,
-          error: e as Error,
+          error: e,
         };
       }
     }

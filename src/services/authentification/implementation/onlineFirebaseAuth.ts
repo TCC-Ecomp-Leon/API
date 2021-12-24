@@ -72,7 +72,7 @@ const createAuthAccount = async (
   } catch (e) {
     return {
       success: false,
-      error: e as Error,
+      error: e,
     };
   }
 };
@@ -100,7 +100,7 @@ const checkLoginToken = async (
   } catch (e) {
     return {
       success: false,
-      error: e as Error,
+      error: e,
     };
   }
 };
@@ -118,7 +118,7 @@ const signOutAllAcounts = async (
   } catch (e) {
     return {
       success: false,
-      error: e as Error,
+      error: e,
     };
   }
 
@@ -159,7 +159,7 @@ const signInWithEmailAndPassword = async (
   } catch (e) {
     return {
       success: false,
-      error: e as Error,
+      error: e,
     };
   }
 };
@@ -183,7 +183,7 @@ const updateEmailAndPassword = async (
   } catch (e) {
     return {
       success: false,
-      error: e as Error,
+      error: e,
     };
   }
 };
@@ -201,7 +201,7 @@ const deleteAccount = async (token: string): Promise<DatabaseResult<null>> => {
   } catch (e) {
     return {
       success: false,
-      error: e as Error,
+      error: e,
     };
   }
 
@@ -225,7 +225,7 @@ const requestResetPassword = async (
   } catch (e) {
     return {
       success: false,
-      error: e as Error,
+      error: e,
     };
   }
 };
@@ -253,7 +253,7 @@ const readAuthProfile = async (
   } catch (e) {
     return {
       success: false,
-      error: e as Error,
+      error: e,
     };
   }
 };

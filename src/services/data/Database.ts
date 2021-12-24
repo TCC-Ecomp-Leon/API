@@ -43,7 +43,7 @@ const addData = async <T>(
   } catch (e) {
     return {
       success: false,
-      error: e as Error,
+      error: e,
     };
   }
 };
@@ -63,7 +63,7 @@ const updatePartialData = async <T>(
   } catch (e) {
     return {
       success: false,
-      error: e as Error,
+      error: e,
     };
   }
 };
@@ -88,7 +88,7 @@ const updatePushData = async <T, M>(
   } catch (e) {
     return {
       success: false,
-      error: e as Error,
+      error: e,
     };
   }
 };
@@ -112,7 +112,7 @@ const updateGenericData = async <T, M>(
   } catch (e) {
     return {
       success: false,
-      error: e as Error,
+      error: e,
     };
   }
 };
@@ -136,7 +136,7 @@ const updateGenericDatas = async <T, M>(
   } catch (e) {
     return {
       success: false,
-      error: e as Error,
+      error: e,
     };
   }
 };
@@ -167,7 +167,7 @@ const readData = async <T>(
   } catch (e) {
     return {
       success: false,
-      error: e as Error,
+      error: e,
     };
   }
 };
@@ -203,7 +203,7 @@ const readDatas = async <T, M>(
   } catch (e) {
     return {
       success: false,
-      error: e as Error,
+      error: e,
     };
   }
 };
@@ -226,7 +226,7 @@ const readCollection = async <T>(
   } catch (e) {
     return {
       success: false,
-      error: e as Error,
+      error: e,
     };
   }
 };
@@ -249,7 +249,7 @@ const remove = async <T>(
   } catch (e) {
     return {
       success: false,
-      error: e as Error,
+      error: e,
     };
   }
 };

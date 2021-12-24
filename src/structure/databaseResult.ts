@@ -5,5 +5,5 @@ export type DatabaseResult<T> =
     }
   | {
       success: false;
-      error: Error;
+      error: unknown;
     };
