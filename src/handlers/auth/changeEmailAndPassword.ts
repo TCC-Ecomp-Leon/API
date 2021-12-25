@@ -2,7 +2,7 @@ import {
   DatabaseService,
   withDatabaseTransaction,
 } from '../../config/database';
-import { Perfil } from '../../models';
+import { Perfil, RegraPerfil } from '../../models';
 import {
   readAuthProfile,
   updateEmailAndPassword,
@@ -17,6 +17,7 @@ import { LoginValidator } from '../../schemas/login';
 export const changeEmailAndPasswordHandler = new Handler(
   async (context: Context): Promise<NavigationResult<null>> => {
     const userProfile = context.getVariable<Perfil>('profile');
+
     const body = context.body;
 
     if (!LoginValidator(body)) {
@@ -26,6 +27,10 @@ export const changeEmailAndPasswordHandler = new Handler(
           error: JSON.stringify(LoginValidator.errors),
         },
       };
+    }
+
+    if (userProfile.regra !== RegraPerfil.Geral) {
+      body.email = userProfile.email;
     }
 
     const service: DatabaseService<NavigationResult<null>> = async (

@@ -7,7 +7,7 @@ import {
   DatabaseService,
   withDatabaseTransaction,
 } from '../../config/database';
-import { ValidatorCodigoDeEntrada } from '../../schemas/codigoEntrada';
+import { ValidatorUsoCodigoDeEntrada } from '../../schemas/codigoEntrada';
 import RepositorioCodigoDeEntrada from '../../services/repositories/RepositorioCodigoDeEntrada';
 import RepositorioPerfil from '../../services/repositories/RepositorioPerfil';
 import RepositorioUniversitario from '../../services/repositories/RepositorioUniversitario';
@@ -26,7 +26,7 @@ export const signUpNavigation = new Navigation([
           const codigoDeEntrada = body['codigoDeEntrada'];
           return codigoDeEntrada !== undefined;
         },
-        validator: ValidatorCodigoDeEntrada,
+        validator: ValidatorUsoCodigoDeEntrada,
       },
     ],
     (body) => {
