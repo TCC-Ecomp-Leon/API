@@ -24,7 +24,7 @@ const addDymmyData = async (
   } catch (e) {
     return {
       success: false,
-      error: e as Error,
+      error: e,
     };
   }
 };
@@ -46,7 +46,7 @@ const readDummyDatas = async (
   } catch (e) {
     return {
       success: false,
-      error: e as Error,
+      error: e,
     };
   }
 };
@@ -69,7 +69,7 @@ const updateDummyData = async (
   } catch (e) {
     return {
       success: false,
-      error: e as Error,
+      error: e,
     };
   }
 };

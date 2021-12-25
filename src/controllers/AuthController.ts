@@ -2,7 +2,8 @@ import Controller from '../structure/controller';
 import { Express, Request, Response } from 'express';
 import { signInNavigation } from '../navigations/auth/signInNavigation';
 import { signUpNavigation } from '../navigations/auth/signUpNavigation';
-import { tokenGetProfileNavigation } from '../navigations/auth/tokenGetProfileNavigation';
+import { changeEmailAndPasswordNavigation } from '../navigations/auth/changeEmailAndPassword';
+import { resetPasswordNavigation } from '../navigations/auth/resetPassword';
 
 export class AuthController extends Controller {
   signIn(req: Request, res: Response) {
@@ -13,7 +14,11 @@ export class AuthController extends Controller {
     this.runNavigation(signUpNavigation, req, res);
   }
 
-  tokenGetProfile(req: Request, res: Response) {
-    this.runNavigation(tokenGetProfileNavigation, req, res);
+  resetPassword(req: Request, res: Response) {
+    this.runNavigation(resetPasswordNavigation, req, res);
+  }
+
+  changeEmailAndPassword(req: Request, res: Response) {
+    this.runNavigation(changeEmailAndPasswordNavigation, req, res);
   }
 }

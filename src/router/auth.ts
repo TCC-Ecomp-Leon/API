@@ -7,4 +7,11 @@ const authController = new AuthController();
 
 router.put('/auth/sign', authController.signIn.bind(authController));
 router.post('/auth/sign', authController.signUp.bind(authController));
-router.get('/auth/sign', authController.tokenGetProfile.bind(authController));
+router.post(
+  '/auth/reset-password',
+  authController.resetPassword.bind(authController)
+);
+router.put(
+  '/auth/change-email-and-password',
+  authController.changeEmailAndPassword.bind(authController)
+);

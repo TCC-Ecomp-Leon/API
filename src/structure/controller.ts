@@ -11,7 +11,7 @@ export default class Controller {
       res.status(handlersResponse.status).send(handlersResponse.body);
     } else {
       console.warn('ERROR');
-      console.warn(handlersResponse.error.message);
+      console.warn(handlersResponse.error);
       res.status(500).send({});
     }
   }

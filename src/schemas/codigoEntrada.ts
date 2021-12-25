@@ -1,7 +1,11 @@
 import Ajv, { JSONSchemaType } from 'ajv';
-const ajv = new Ajv();
+import { TipoCodigoDeEntrada } from '../models';
 
-const codigoDeEntrada: JSONSchemaType<{
+const ajv = new Ajv({
+  allowUnionTypes: true,
+});
+
+const userCodigoDeEntrada: JSONSchemaType<{
   codigoDeEntrada: string;
 }> = {
   type: 'object',
@@ -12,4 +16,38 @@ const codigoDeEntrada: JSONSchemaType<{
   additionalProperties: true,
 };
 
-export const ValidatorCodigoDeEntrada = ajv.compile(codigoDeEntrada);
+const informacoesCodigoDeEntrada: JSONSchemaType<
+  | {
+      tipo: TipoCodigoDeEntrada.Professor;
+      idCurso: string;
+      idMateria: string;
+    }
+  | { tipo: TipoCodigoDeEntrada.Aluno; idCurso: string }
+> = {
+  oneOf: [
+    {
+      type: 'object',
+      properties: {
+        tipo: { type: 'integer', const: TipoCodigoDeEntrada.Professor },
+        idCurso: { type: 'string' },
+        idMateria: { type: 'string' },
+      },
+      required: ['idCurso', 'idMateria', 'tipo'],
+      additionalProperties: true,
+    },
+    {
+      type: 'object',
+      properties: {
+        tipo: { type: 'integer', const: TipoCodigoDeEntrada.Aluno },
+        idCurso: { type: 'string' },
+      },
+      required: ['tipo', 'idCurso'],
+      additionalProperties: true,
+    },
+  ],
+};
+
+export const ValidatorUsoCodigoDeEntrada = ajv.compile(userCodigoDeEntrada);
+export const ValidatorCriacaoCodigoDeEntrada = ajv.compile(
+  informacoesCodigoDeEntrada
+);

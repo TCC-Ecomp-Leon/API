@@ -31,7 +31,7 @@ const readLocalUsers = async (): Promise<DatabaseResult<Array<User>>> => {
 
     return { success: true, data: JSON.parse(read) as Array<User> };
   } catch (e) {
-    return { success: false, error: e as Error };
+    return { success: false, error: e };
   }
 };
 
@@ -45,7 +45,7 @@ const writeLocalUsers = async (
 
     return { success: true, data: null };
   } catch (e) {
-    return { success: false, error: e as Error };
+    return { success: false, error: e };
   }
 };
 
@@ -96,7 +96,7 @@ const createAuthAccount = async (
       },
     };
   } catch (e) {
-    return { success: false, error: e as Error };
+    return { success: false, error: e };
   }
 };
 
@@ -128,7 +128,7 @@ const checkLoginToken = async (
       },
     };
   } catch (e) {
-    return { success: false, error: e as Error };
+    return { success: false, error: e };
   }
 };
 
@@ -174,7 +174,7 @@ const signOutAllAcounts = async (
   } catch (e) {
     return {
       success: false,
-      error: e as Error,
+      error: e,
     };
   }
 };
@@ -232,7 +232,7 @@ const signInWithEmailAndPassword = async (
       },
     };
   } catch (e) {
-    return { success: false, error: e as Error };
+    return { success: false, error: e };
   }
 };
 
@@ -288,7 +288,7 @@ const updateEmailAndPassword = async (
       },
     };
   } catch (e) {
-    return { success: false, error: e as Error };
+    return { success: false, error: e };
   }
 };
 
@@ -329,9 +329,34 @@ const deleteAccount = async (token: string): Promise<DatabaseResult<null>> => {
   } catch (e) {
     return {
       success: false,
-      error: e as Error,
+      error: e,
     };
   }
+};
+
+const readAuthProfile = async (
+  id: string
+): Promise<DatabaseResult<{ email: string; emailVerified: boolean }>> => {
+  const readUsers = await readLocalUsers();
+  if (!readUsers.success) {
+    return { success: false, error: readUsers.error };
+  }
+
+  const find = readUsers.data.find((user) => user.userId === id);
+  if (find === undefined) {
+    return {
+      success: false,
+      error: Error("That user doesn't have an account"),
+    };
+  }
+
+  return {
+    success: true,
+    data: {
+      email: find.email,
+      emailVerified: false,
+    },
+  };
 };
 
 export default {
@@ -341,4 +366,5 @@ export default {
   signInWithEmailAndPassword,
   updateEmailAndPassword,
   deleteAccount,
+  readAuthProfile,
 };

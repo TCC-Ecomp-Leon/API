@@ -72,7 +72,7 @@ const createAuthAccount = async (
   } catch (e) {
     return {
       success: false,
-      error: e as Error,
+      error: e,
     };
   }
 };
@@ -100,7 +100,7 @@ const checkLoginToken = async (
   } catch (e) {
     return {
       success: false,
-      error: e as Error,
+      error: e,
     };
   }
 };
@@ -118,7 +118,7 @@ const signOutAllAcounts = async (
   } catch (e) {
     return {
       success: false,
-      error: e as Error,
+      error: e,
     };
   }
 
@@ -159,7 +159,7 @@ const signInWithEmailAndPassword = async (
   } catch (e) {
     return {
       success: false,
-      error: e as Error,
+      error: e,
     };
   }
 };
@@ -183,7 +183,7 @@ const updateEmailAndPassword = async (
   } catch (e) {
     return {
       success: false,
-      error: e as Error,
+      error: e,
     };
   }
 };
@@ -201,7 +201,7 @@ const deleteAccount = async (token: string): Promise<DatabaseResult<null>> => {
   } catch (e) {
     return {
       success: false,
-      error: e as Error,
+      error: e,
     };
   }
 
@@ -225,7 +225,35 @@ const requestResetPassword = async (
   } catch (e) {
     return {
       success: false,
-      error: e as Error,
+      error: e,
+    };
+  }
+};
+
+const readAuthProfile = async (
+  id: string
+): Promise<DatabaseResult<{ email: string; emailVerified: boolean }>> => {
+  try {
+    const { auth, adminAuth } = getFirebaseReference();
+
+    const user = await adminAuth.getUser(id);
+    if (user.email === undefined) {
+      return {
+        success: false,
+        error: Error('User without email'),
+      };
+    }
+    return {
+      success: true,
+      data: {
+        email: user.email,
+        emailVerified: user.emailVerified,
+      },
+    };
+  } catch (e) {
+    return {
+      success: false,
+      error: e,
     };
   }
 };
@@ -238,4 +266,5 @@ export default {
   updateEmailAndPassword,
   deleteAccount,
   requestResetPassword,
+  readAuthProfile,
 };

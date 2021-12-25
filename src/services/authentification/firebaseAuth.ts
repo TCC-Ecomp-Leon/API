@@ -115,3 +115,16 @@ export const requestResetPassword = async (
     return await onlineAuth.requestResetPassword(email);
   }
 };
+
+export const readAuthProfile = async (
+  id: string
+): Promise<DatabaseResult<{ email: string; emailVerified: boolean }>> => {
+  if (
+    environmentVariables().ENV === 'LOCAL' ||
+    environmentVariables().ENV === 'TEST'
+  ) {
+    return await localAuth.readAuthProfile(id);
+  } else {
+    return await onlineAuth.readAuthProfile(id);
+  }
+};

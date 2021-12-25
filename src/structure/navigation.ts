@@ -2,7 +2,9 @@ import { Express, Request, Response } from 'express';
 import { ClientSession, Db } from 'mongodb';
 import { DatabaseService, withDatabaseTransaction } from '../config/database';
 import { authHandler } from '../handlers/auth/authHandler';
+import { Perfil } from '../models';
 import { checkLoginToken } from '../services/authentification/firebaseAuth';
+import RepositorioPerfil from '../services/repositories/RepositorioPerfil';
 import Context from './context';
 import { DatabaseResult } from './databaseResult';
 import Handler from './handler';
@@ -25,7 +27,7 @@ export default class Navigation {
       }
     | {
         success: false;
-        error: Error;
+        error: unknown;
       }
   > {
     for (let i = 0; i < this.handlers.length; i++) {
@@ -39,7 +41,7 @@ export default class Navigation {
       } catch (e) {
         return {
           success: false,
-          error: e as Error,
+          error: e,
         };
       }
     }
@@ -48,15 +50,25 @@ export default class Navigation {
   }
 }
 
-export const ProtectedNavigation = <T>(
+const getProfile = async (
+  userId: string,
+  email: string,
+  session: ClientSession,
+  db: Db
+): Promise<DatabaseResult<Perfil | null>> => {
+  const profile = await RepositorioPerfil.readPerfil(
+    userId,
+    email,
+    false,
+    db,
+    session
+  );
+  return profile;
+};
+
+export const ProtectedNavigation = (
   handlers: Array<Handler<any>>,
-  getProfile: (
-    userId: string,
-    email: string,
-    session: ClientSession,
-    db: Db
-  ) => Promise<DatabaseResult<T | null>>,
-  roleFunction?: (profile: T) => boolean
+  roleFunction?: (profile: Perfil) => boolean
 ) => {
   return new Navigation([authHandler(getProfile, roleFunction), ...handlers]);
 };
