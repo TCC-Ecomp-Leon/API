@@ -2,6 +2,7 @@ import {
   DatabaseService,
   withDatabaseTransaction,
 } from '../../config/database';
+import { Endereco } from '../../models';
 import { RegistroProjetoValidator } from '../../schemas/projeto';
 import RepositorioProjeto from '../../services/repositories/RepositorioProjeto';
 import Context from '../../structure/context';
@@ -10,7 +11,7 @@ import { NavigationResult } from '../../structure/navigation';
 
 export const registrarProjetoHandler = new Handler(
   async (context: Context): Promise<NavigationResult<null>> => {
-    const body = context.body as object;
+    const body = context.body;
 
     if (!RegistroProjetoValidator(body)) {
       return {
@@ -25,12 +26,19 @@ export const registrarProjetoHandler = new Handler(
       db,
       session
     ) => {
+      const informacoes = body as {
+        nome: string;
+        descricao: string;
+        email: string;
+        telefone: number;
+        endereco: Endereco;
+      };
       const result = await RepositorioProjeto.adicionarProjeto(
-        body.nome,
-        body.descricao,
-        body.email,
-        body.telefone,
-        body.endereco,
+        informacoes.nome,
+        informacoes.descricao,
+        informacoes.email,
+        informacoes.telefone,
+        informacoes.endereco,
         db,
         session
       );
