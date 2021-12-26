@@ -1,8 +1,14 @@
 import { v4 as uuid } from 'uuid';
 import { Db, ClientSession } from 'mongodb';
-import { Curso, Endereco, Materia, Projeto } from '../../models';
+import {
+  Curso,
+  Endereco,
+  InformacoesProjeto,
+  Materia,
+  Projeto,
+} from '../../models';
 import { DatabaseResult } from '../../structure/databaseResult';
-import Database from '../data/Database';
+import Database, { SearchType } from '../data/Database';
 
 const collection = 'Projeto';
 
@@ -16,6 +22,29 @@ const readProjeto = (
   return Database.readData<Projeto>(
     collection,
     [{ key: identificadorProjeto, value: id }],
+    db,
+    session
+  );
+};
+
+const readProjetos = (
+  aprovado: boolean | undefined,
+  db: Db,
+  session: ClientSession
+): Promise<DatabaseResult<Projeto[]>> => {
+  const searchParameters: SearchType<Projeto>[] = [];
+  if (aprovado !== undefined) {
+    const campoAprovacao: keyof Projeto = 'aprovado';
+
+    searchParameters.push({
+      key: campoAprovacao,
+      value: aprovado,
+    });
+  }
+
+  return Database.readDatas<Projeto, Projeto>(
+    collection,
+    searchParameters,
     db,
     session
   );
@@ -264,8 +293,48 @@ const atribuirProfessorAMateria = (
   );
 };
 
+const removerProjetoPorEmail = (
+  email: string,
+  db: Db,
+  session: ClientSession
+): Promise<DatabaseResult<null>> => {
+  const campoEmail: keyof Projeto = 'email';
+
+  return Database.remove(
+    collection,
+    [
+      {
+        key: campoEmail,
+        value: email,
+      },
+    ],
+    db,
+    session
+  );
+};
+
+const atualizarProjeto = (
+  idProjeto: string,
+  informacoes: Partial<
+    Omit<InformacoesProjeto, 'id' | 'email' | 'requisicaoEntradaEm'>
+  >,
+  db: Db,
+  session: ClientSession
+): Promise<DatabaseResult<null>> => {
+  const campoId: keyof Projeto = 'id';
+
+  return Database.updatePartialData(
+    collection,
+    [{ key: campoId, value: idProjeto }],
+    informacoes,
+    db,
+    session
+  );
+};
+
 export default {
   readProjeto, //testado
+  readProjetos,
   readProjetoPorEmail, //testado
   readCursosProjeto, //testado
   readCursosAluno, //testado
@@ -275,4 +344,6 @@ export default {
   adicionarCurso, //testado
   adicionarAlunoAoCurso, //testado
   atribuirProfessorAMateria, //testado
+  removerProjetoPorEmail,
+  atualizarProjeto,
 };

@@ -29,13 +29,18 @@ export type OperationResult<T> =
   | {
       status: 404;
       body: {
-        error: 'PROFILE_NOT_FOUND' | 'DATA_NOT_FOUND' | 'CURSO_NAO_ENCONTRADO' | 'MATERIA_NAO_ENCONTRADA';
+        error:
+          | 'PROFILE_NOT_FOUND'
+          | 'DATA_NOT_FOUND'
+          | 'CURSO_NAO_ENCONTRADO'
+          | 'MATERIA_NAO_ENCONTRADA'
+          | 'PROJETO_NAO_ENCONTRADO';
       };
     }
   | {
       status: 406;
       body: {
-        error: 'CANT_REGISTER_THAT_PROFILE';
+        error: 'CANT_REGISTER_THAT_PROFILE' | 'PROJETO_JA_APROVADO';
       };
     }
   | null;

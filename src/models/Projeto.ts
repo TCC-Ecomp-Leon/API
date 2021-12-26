@@ -1,7 +1,7 @@
 import { Curso } from './Curso';
 import { Endereco } from './Endereco';
 
-type InformacoesProjeto = {
+export type InformacoesProjeto = {
   /**
    * Identificador do documento do Projeto em questão.
    */

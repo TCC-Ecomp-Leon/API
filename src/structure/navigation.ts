@@ -72,3 +72,13 @@ export const ProtectedNavigation = (
 ) => {
   return new Navigation([authHandler(getProfile, roleFunction), ...handlers]);
 };
+
+export const getCurrentProfile = <T>(context: Context) => {
+  const profile = context.getVariable('profile');
+
+  if (profile === undefined) {
+    throw Error('Wrong usage of the protected navigation');
+  }
+
+  return profile as T;
+};

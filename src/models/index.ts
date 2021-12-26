@@ -28,6 +28,6 @@ export { Curso } from './Curso';
 export { CursoUniversitario } from './CursoUniversitario';
 export { Endereco } from './Endereco';
 export { Materia } from './Materia';
-export { Projeto } from './Projeto';
+export { Projeto, InformacoesProjeto } from './Projeto';
 export { Duvida } from './Duvida';
 export { Localizacao } from './estruturas/Localizacao';

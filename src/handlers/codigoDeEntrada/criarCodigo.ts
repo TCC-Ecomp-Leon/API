@@ -49,7 +49,12 @@ export const criarCodigoHandler = new Handler(
         session
       );
       if (!readProjeto.success) {
-        throw readProjeto.error;
+        return {
+          status: 404,
+          body: {
+            error: 'PROJETO_NAO_ENCONTRADO',
+          },
+        };
       }
 
       const projeto = readProjeto.data;
