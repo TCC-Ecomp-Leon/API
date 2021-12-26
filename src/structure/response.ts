@@ -29,7 +29,7 @@ export type OperationResult<T> =
   | {
       status: 404;
       body: {
-        error: 'PROFILE_NOT_FOUND' | 'DATA_NOT_FOUND';
+        error: 'PROFILE_NOT_FOUND' | 'DATA_NOT_FOUND' | 'CURSO_NAO_ENCONTRADO' | 'MATERIA_NAO_ENCONTRADA';
       };
     }
   | {

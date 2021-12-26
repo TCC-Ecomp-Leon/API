@@ -2,7 +2,12 @@ import {
   DatabaseService,
   withDatabaseTransaction,
 } from '../../config/database';
-import { CodigoDeEntrada, Perfil, RegraPerfil } from '../../models';
+import {
+  CodigoDeEntrada,
+  Perfil,
+  RegraPerfil,
+  TipoCodigoDeEntrada,
+} from '../../models';
 import { ValidatorCriacaoCodigoDeEntrada } from '../../schemas/codigoEntrada';
 import RepositorioCodigoDeEntrada from '../../services/repositories/RepositorioCodigoDeEntrada';
 import RepositorioProjeto from '../../services/repositories/RepositorioProjeto';
@@ -45,6 +50,41 @@ export const criarCodigoHandler = new Handler(
       );
       if (!readProjeto.success) {
         throw readProjeto.error;
+      }
+
+      const projeto = readProjeto.data;
+
+      if (!projeto.aprovado) {
+        return {
+          status: 403,
+          body: {
+            error: 'NOT_AUTHORIZED',
+          },
+        };
+      }
+
+      const curso = projeto.cursos.find((curso) => curso.id === body.idCurso);
+      if (curso === undefined) {
+        return {
+          status: 404,
+          body: {
+            error: 'CURSO_NAO_ENCONTRADO',
+          },
+        };
+      }
+
+      if (body.tipo === TipoCodigoDeEntrada.Professor) {
+        const materia = curso.materias.find(
+          (materia) => materia.id === body.idMateria
+        );
+        if (materia === undefined) {
+          return {
+            status: 404,
+            body: {
+              error: 'MATERIA_NAO_ENCONTRADA',
+            },
+          };
+        }
       }
 
       const result = await RepositorioCodigoDeEntrada.addCodigoDeEntrada(
