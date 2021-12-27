@@ -108,9 +108,13 @@ export const requestResetPassword = async (
     environmentVariables().ENV === 'LOCAL' ||
     environmentVariables().ENV === 'TEST'
   ) {
-    throw Error(
-      "Can't use request reset password in the local firebase implementation"
-    );
+    // throw Error(
+    //   "Can't use request reset password in the local firebase implementation"
+    // );
+    return {
+      success: true,
+      data: null,
+    };
   } else {
     return await onlineAuth.requestResetPassword(email);
   }

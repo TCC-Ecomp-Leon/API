@@ -5,6 +5,7 @@ import {
 import {
   createAuthAccount,
   deleteAccount,
+  requestResetPassword,
 } from '../../services/authentification/firebaseAuth';
 import RepositorioProjeto from '../../services/repositories/RepositorioProjeto';
 import Context from '../../structure/context';
@@ -59,7 +60,6 @@ export const aprovarProjetoHandler = new Handler(
           },
         };
       }
-      // TODO: Enviar um email com essa senha gerada
 
       const alteracoesBanco = await RepositorioProjeto.aprovarProjeto(
         projeto.email,
@@ -71,6 +71,12 @@ export const aprovarProjetoHandler = new Handler(
       if (!alteracoesBanco.success) {
         await deleteAccount(registerResult.data.token);
         throw alteracoesBanco.error;
+      }
+
+      // TODO: Enviar um email com essa senha gerada
+      const resetPassword = await requestResetPassword(projeto.email);
+      if (!resetPassword.success) {
+        throw resetPassword.error;
       }
 
       return {
