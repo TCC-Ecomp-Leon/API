@@ -5,13 +5,9 @@ import { schemaEndereco } from './endereco';
 
 const ajv = new Ajv();
 
-const registroProjeto: JSONSchemaType<{
-  nome: string;
-  descricao: string;
-  email: string;
-  telefone: number;
-  endereco: Endereco;
-}> = {
+const registroProjeto: JSONSchemaType<
+  Omit<InformacoesProjeto, 'id' | 'requisicaoEntradaEm'>
+> = {
   type: 'object',
   properties: {
     nome: { type: 'string' },

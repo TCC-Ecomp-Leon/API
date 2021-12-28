@@ -2,6 +2,8 @@ const mongoDb = require("mongodb");
 const dotenv = require("dotenv");
 const fs = require('fs');
 
+//TODO: Problema para resetar o banco de dados
+
 function initEnv() {
   const options = {
     local: process.env.ENV === undefined || process.env.ENV === 'LOCAL',
@@ -70,12 +72,9 @@ const client = new mongoDb.MongoClient(process.env.MONGODB_URL, {
   ignoreUndefined: true,
 });
 
-client.connect().then(() => {});
-
-client
-  .db()
-  .dropDatabase()
-  .then(() => {});
+client.connect().then(() => {
+  client.db().dropDatabase().then(() => {});
+})
 
 console.log('dropped database');
 
