@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "ts-node-dev src/index.ts",
-    "pretest": "ENV='TEST' node tests_e2e/test_data.js",
+    "pretest": "ENV='TEST' node tests_e2e/test_data.js && ENV='TEST' ts-node src/mocks/index.ts",
     "test": "ENV='TEST' jest"
   },
   "jest": {

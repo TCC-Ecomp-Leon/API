@@ -14,11 +14,13 @@ type EnvirontmentVariables =
       FIREBASE_MESSAGING_SENDER_ID: string;
       FIREBASE_APP_ID: string;
       FIREBASE_MEASUREMENT_ID: string;
+      ADM_PASSWORD: string;
     }
   | {
       ENV: 'LOCAL' | 'TEST';
       JWT_SECRET: string;
       MONGODB_URL: string;
+      ADM_PASSWORD: string;
     };
 
 type _EnvirontmentVariables =
@@ -33,11 +35,13 @@ type _EnvirontmentVariables =
       FIREBASE_MESSAGING_SENDER_ID: string | undefined;
       FIREBASE_APP_ID: string | undefined;
       FIREBASE_MEASUREMENT_ID: string | undefined;
+      ADM_PASSWORD: string | undefined;
     }
   | {
       ENV: 'LOCAL' | 'TEST' | undefined;
       JWT_SECRET: string | undefined;
       MONGODB_URL: string | undefined;
+      ADM_PASSWORD: string | undefined;
     };
 
 export default function (): EnvirontmentVariables {
@@ -51,6 +55,7 @@ export default function (): EnvirontmentVariables {
       ENV: process.env.ENV,
       JWT_SECRET: process.env.JWT_SECRET,
       MONGODB_URL: process.env.MONGODB_URL,
+      ADM_PASSWORD: process.env.ADM_PASSWORD,
     };
   } else {
     envVariables = {
@@ -67,6 +72,7 @@ export default function (): EnvirontmentVariables {
       FIREBASE_MESSAGING_SENDER_ID: process.env.FIREBASE_MESSAGING_SENDER_ID,
       FIREBASE_APP_ID: process.env.FIREBASE_APP_ID,
       FIREBASE_MEASUREMENT_ID: process.env.FIREBASE_MEASUREMENT_ID,
+      ADM_PASSWORD: process.env.ADM_PASSWORD,
     };
   }
 
