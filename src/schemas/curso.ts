@@ -1,11 +1,14 @@
 import Ajv, { JSONSchemaType } from 'ajv';
 import { Curso } from '../models';
 import { schemaMateria } from './materia';
+import addFormats from 'ajv-formats';
 
 const ajv = new Ajv({
   allowUnionTypes: true,
   timestamp: 'date',
 });
+
+addFormats(ajv);
 
 const curso: JSONSchemaType<
   Omit<
