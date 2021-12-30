@@ -68,6 +68,48 @@ const updatePartialData = async <T>(
   }
 };
 
+const insertNestedFieldPrefix = <T>(prefix: string, data: T) => {
+  let ret = {};
+
+  const keys = Object.keys(data);
+
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i] as keyof T;
+
+    ret = {
+      ...ret,
+      [prefix + key]: data[key],
+    };
+  }
+
+  return ret;
+};
+
+const updateNestedPartialData = async <T, M>(
+  collection: string,
+  searchParameters: SearchType<T>[],
+  keyField: string,
+  data: Partial<M>,
+  db: Db,
+  session: ClientSession
+): Promise<DatabaseResult<null>> => {
+  try {
+    await db
+      .collection(collection)
+      .updateOne(
+        _getValues(searchParameters),
+        { $set: insertNestedFieldPrefix(keyField + '.', data) },
+        { session }
+      );
+    return { success: true, data: null };
+  } catch (e) {
+    return {
+      success: false,
+      error: e,
+    };
+  }
+};
+
 const updatePushData = async <T, M>(
   collection: string,
   searchParameters: SearchType<T>[],
@@ -263,5 +305,6 @@ export default {
   updateGenericDatas,
   updateGenericData,
   updatePushData,
+  updateNestedPartialData,
   remove,
 };

@@ -4,6 +4,7 @@ import { router as dummyRouter } from './router/dummy';
 import { router as authRouter } from './router/auth';
 import { router as profileRouter } from './router/profile';
 import { router as projetoRouter } from './router/projeto';
+import { router as cursoRouter } from './router/curso';
 
 const app = express();
 app.use(json({ limit: '50mb' }));
@@ -12,5 +13,6 @@ app.use(dummyRouter);
 app.use(authRouter);
 app.use(profileRouter);
 app.use(projetoRouter);
+app.use(cursoRouter);
 
 export default app;

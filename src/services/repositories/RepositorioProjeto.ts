@@ -226,7 +226,7 @@ const aprovarProjeto = (
 
 const adicionarCurso = (
   idProjeto: string,
-  curso: Curso,
+  curso: Omit<Curso, 'id' | 'atualizadoEm' | 'idProjeto' | 'turma'>,
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<null>> => {
@@ -236,7 +236,13 @@ const adicionarCurso = (
     collection,
     [{ key: identificadorProjeto, value: idProjeto }],
     'cursos',
-    curso,
+    {
+      ...curso,
+      id: uuid(),
+      atualizadoEm: new Date(),
+      idProjeto: idProjeto,
+      turma: [],
+    },
     db,
     session
   );
@@ -332,6 +338,29 @@ const atualizarProjeto = (
   );
 };
 
+const atualizarCurso = (
+  idProjeto: string,
+  idCurso: string,
+  curso: Partial<Omit<Curso, 'id' | 'atualizadoEm' | 'idProjeto' | 'turma'>>,
+  db: Db,
+  session: ClientSession
+): Promise<DatabaseResult<null>> => {
+  const identificadorProjeto: keyof Projeto = 'id';
+  const identificadorCurso = 'cursos.id';
+
+  return Database.updateNestedPartialData<Projeto, Curso>(
+    collection,
+    [
+      { key: identificadorProjeto, value: idProjeto },
+      { key: identificadorCurso, value: idCurso },
+    ],
+    'cursos.0',
+    curso,
+    db,
+    session
+  );
+};
+
 export default {
   readProjeto, //testado
   readProjetos,
@@ -346,4 +375,5 @@ export default {
   atribuirProfessorAMateria, //testado
   removerProjetoPorEmail,
   atualizarProjeto,
+  atualizarCurso,
 };
