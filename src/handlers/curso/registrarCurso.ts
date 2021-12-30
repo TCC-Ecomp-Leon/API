@@ -65,7 +65,7 @@ export const RegistrarCursoHandler = new Handler(
 
       const registro = await RepositorioProjeto.adicionarCurso(
         idProjeto,
-        body,
+        body as any,
         db,
         session
       );
