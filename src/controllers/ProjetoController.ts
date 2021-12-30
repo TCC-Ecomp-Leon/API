@@ -5,6 +5,7 @@ import { aprovarProjetoNavigation } from '../navigations/projeto/aprovarProjeto'
 import { getProjetosNaoAprovadosNavigation } from '../navigations/projeto/getProjetosNaoAprovados';
 import { getProjetosNavigation } from '../navigations/projeto/getProjetos';
 import { atualizarProjetoNavigation } from '../navigations/projeto/atualizarProjeto';
+import { getProjetoNavigation } from '../navigations/projeto/getProjeto';
 
 export class ProjetoController extends Controller {
   registrarProjeto(req: Request, res: Response) {
@@ -21,6 +22,10 @@ export class ProjetoController extends Controller {
 
   getProjetos(req: Request, res: Response) {
     this.runNavigation(getProjetosNavigation, req, res);
+  }
+
+  getProjeto(req: Request, res: Response) {
+    this.runNavigation(getProjetoNavigation, req, res);
   }
 
   atualizarProjeto(req: Request, res: Response) {

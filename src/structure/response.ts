@@ -43,4 +43,10 @@ export type OperationResult<T> =
         error: 'CANT_REGISTER_THAT_PROFILE' | 'PROJETO_JA_APROVADO';
       };
     }
+  | {
+      status: 409;
+      body: {
+        error: 'DATA_ALREADY_EXISTS';
+      };
+    }
   | null;

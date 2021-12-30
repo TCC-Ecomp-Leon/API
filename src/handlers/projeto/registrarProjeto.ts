@@ -33,6 +33,22 @@ export const registrarProjetoHandler = new Handler(
         telefone: number;
         endereco: Endereco;
       };
+
+      const consultaExistenciaProjeto =
+        await RepositorioProjeto.readProjetoPorEmail(
+          informacoes.email,
+          db,
+          session
+        );
+      if (consultaExistenciaProjeto.success) {
+        return {
+          status: 409,
+          body: {
+            error: 'DATA_ALREADY_EXISTS',
+          },
+        };
+      }
+
       const result = await RepositorioProjeto.adicionarProjeto(
         informacoes.nome,
         informacoes.descricao,
