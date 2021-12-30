@@ -10,6 +10,7 @@ export default class Context {
   header: IncomingHttpHeaders;
   method: Method;
   params: Record<string, any>;
+  query: Record<string, any>;
 
   _variables: { [key: string]: any };
 
@@ -21,7 +22,8 @@ export default class Context {
     this.method = req.method as Method;
     if (this.method === undefined || this.method === null)
       throw Error('Invalid http method');
-    this.params = { ...req.params, ...req.query };
+    this.params = { ...req.params };
+    this.query = { ...req.query };
     this._variables = new Object();
   }
 
