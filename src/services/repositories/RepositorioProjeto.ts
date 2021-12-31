@@ -111,15 +111,17 @@ const readCursosAluno = async (
 
   if (!cursos.success) return cursos;
 
+  const listaDeCursos: Curso[] =
+    cursos.data.length > 0
+      ? Array.prototype.concat.apply(
+          [],
+          cursos.data.map((curso) => curso.cursos)
+        )
+      : [];
+
   return {
     success: true,
-    data:
-      cursos.data.length > 0
-        ? Array.prototype.concat.apply(
-            [],
-            cursos.data.map((curso) => curso.cursos)
-          )
-        : [],
+    data: listaDeCursos.filter((curso) => curso.turma.includes(idAluno)),
   };
 };
 
@@ -157,7 +159,9 @@ const readMateriasProfessor = async (
 
   return {
     success: true,
-    data: materias,
+    data: materias.filter(
+      (materia) => materia.idPerfilProfessor === idProfessor
+    ),
   };
 };
 
