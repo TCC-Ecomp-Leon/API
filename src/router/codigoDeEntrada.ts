@@ -6,18 +6,18 @@ export const router = express.Router();
 const codigoDeEntradaController = new CodigoDeEntradaController();
 
 router.delete(
-  '/codigoDeEntrada/:id',
+  '/codigo-de-entrada/:id',
   codigoDeEntradaController.deletarCodigo.bind(codigoDeEntradaController)
 );
 router.put(
-  '/codigoDeEntrada/:id',
+  '/codigo-de-entrada/:id',
   codigoDeEntradaController.usarCodigo.bind(codigoDeEntradaController)
 );
 router.get(
-  '/codigoDeEntrada',
+  '/codigo-de-entrada',
   codigoDeEntradaController.getCodigos.bind(codigoDeEntradaController)
 );
 router.post(
-  '/codigoDeEntrada',
+  '/codigo-de-entrada',
   codigoDeEntradaController.criarCodigo.bind(codigoDeEntradaController)
 );

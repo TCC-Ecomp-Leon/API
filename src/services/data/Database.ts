@@ -21,9 +21,6 @@ const _getValues = <T>(
 ): object => {
   let search: object = {};
 
-  if (searchParameters.length === 0) {
-    throw Error("Can't use a query service without search parameters");
-  }
   for (let i = 0; i < searchParameters.length; i++) {
     const { key, value } = searchParameters[i];
     search = { ...search, [key]: value };

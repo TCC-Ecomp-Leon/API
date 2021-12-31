@@ -8,7 +8,10 @@ import {
   RegraPerfil,
   TipoCodigoDeEntrada,
 } from '../../models';
-import { ValidatorCriacaoCodigoDeEntrada } from '../../schemas/codigoEntrada';
+import {
+  InformacoesCodigoDeEntrada,
+  ValidatorCriacaoCodigoDeEntrada,
+} from '../../schemas/codigoEntrada';
 import RepositorioCodigoDeEntrada from '../../services/repositories/RepositorioCodigoDeEntrada';
 import RepositorioProjeto from '../../services/repositories/RepositorioProjeto';
 import Context from '../../structure/context';
@@ -19,7 +22,7 @@ export const criarCodigoHandler = new Handler(
   async (
     context: Context
   ): Promise<NavigationResult<{ codigo: CodigoDeEntrada }>> => {
-    const body = context.body as object;
+    const body = context.body as any;
     if (!ValidatorCriacaoCodigoDeEntrada(body)) {
       return {
         status: 400,
@@ -28,6 +31,8 @@ export const criarCodigoHandler = new Handler(
         },
       };
     }
+
+    const informacoesCodigo = body as InformacoesCodigoDeEntrada;
 
     const userProfile = context.getVariable<Perfil>('profile');
 
@@ -68,7 +73,9 @@ export const criarCodigoHandler = new Handler(
         };
       }
 
-      const curso = projeto.cursos.find((curso) => curso.id === body.idCurso);
+      const curso = projeto.cursos.find(
+        (curso) => curso.id === informacoesCodigo.idCurso
+      );
       if (curso === undefined) {
         return {
           status: 404,
@@ -78,9 +85,9 @@ export const criarCodigoHandler = new Handler(
         };
       }
 
-      if (body.tipo === TipoCodigoDeEntrada.Professor) {
+      if (informacoesCodigo.tipo === TipoCodigoDeEntrada.Professor) {
         const materia = curso.materias.find(
-          (materia) => materia.id === body.idMateria
+          (materia) => materia.id === informacoesCodigo.idMateria
         );
         if (materia === undefined) {
           return {
@@ -94,7 +101,7 @@ export const criarCodigoHandler = new Handler(
 
       const result = await RepositorioCodigoDeEntrada.addCodigoDeEntrada(
         readProjeto.data.id,
-        body,
+        informacoesCodigo,
         db,
         session
       );

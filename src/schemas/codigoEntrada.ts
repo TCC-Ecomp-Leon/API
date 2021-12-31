@@ -16,14 +16,15 @@ const userCodigoDeEntrada: JSONSchemaType<{
   additionalProperties: true,
 };
 
-const informacoesCodigoDeEntrada: JSONSchemaType<
+export type InformacoesCodigoDeEntrada =
   | {
       tipo: TipoCodigoDeEntrada.Professor;
       idCurso: string;
       idMateria: string;
     }
-  | { tipo: TipoCodigoDeEntrada.Aluno; idCurso: string }
-> = {
+  | { tipo: TipoCodigoDeEntrada.Aluno; idCurso: string };
+
+const informacoesCodigoDeEntrada: JSONSchemaType<InformacoesCodigoDeEntrada> = {
   oneOf: [
     {
       type: 'object',
