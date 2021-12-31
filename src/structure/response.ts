@@ -40,7 +40,10 @@ export type OperationResult<T> =
   | {
       status: 406;
       body: {
-        error: 'CANT_REGISTER_THAT_PROFILE' | 'PROJETO_JA_APROVADO';
+        error:
+          | 'CANT_REGISTER_THAT_PROFILE'
+          | 'PROJETO_JA_APROVADO'
+          | 'CODIGO_JA_USADO';
       };
     }
   | {

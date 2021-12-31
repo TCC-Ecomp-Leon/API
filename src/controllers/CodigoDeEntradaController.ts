@@ -3,6 +3,7 @@ import { Express, Request, Response } from 'express';
 import { getCodigosNavigation } from '../navigations/codigoDeEntrada/getCodigos';
 import { criarCodigoNavigation } from '../navigations/codigoDeEntrada/criarCodigo';
 import { deletarCodigoNavigation } from '../navigations/codigoDeEntrada/deletarCodigo';
+import { usarCodigoNavigation } from '../navigations/codigoDeEntrada/usarCodigo';
 
 export class CodigoDeEntradaController extends Controller {
   getCodigos(req: Request, res: Response) {
@@ -15,5 +16,9 @@ export class CodigoDeEntradaController extends Controller {
 
   deletarCodigo(req: Request, res: Response) {
     this.runNavigation(deletarCodigoNavigation, req, res);
+  }
+
+  usarCodigo(req: Request, res: Response) {
+    this.runNavigation(usarCodigoNavigation, req, res);
   }
 }
