@@ -24,7 +24,7 @@ const mockData = async (): Promise<void> => {
     telefone: 12000000000,
     entradaEm: new Date(),
     fotoPerfil: assets.imgProjeto,
-    regra: RegraPerfil.Administrador,
+    regra: RegraPerfil.Projeto,
   };
 
   const idProjeto = '4765b63b-a539-4ef4-8180-6326f2b0ce89';

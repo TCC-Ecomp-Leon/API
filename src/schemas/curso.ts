@@ -19,9 +19,9 @@ const curso: JSONSchemaType<
   type: 'object',
   properties: {
     nome: { type: 'string' },
-    descricao: { type: 'string', format: 'date' },
-    inicioCurso: { type: 'string', format: 'date' },
-    fimCurso: { type: 'string' },
+    descricao: { type: 'string' },
+    inicioCurso: { type: 'string', format: 'date-time' },
+    fimCurso: { type: 'string', format: 'date-time' },
     materias: {
       type: 'array',
       items: schemaMateria,
@@ -42,9 +42,9 @@ const atualizacaoCurso: JSONSchemaType<
   type: 'object',
   properties: {
     nome: { type: 'string', nullable: true },
-    descricao: { type: 'string', format: 'date', nullable: true },
-    inicioCurso: { type: 'string', format: 'date', nullable: true },
-    fimCurso: { type: 'string', nullable: true },
+    descricao: { type: 'string', nullable: true },
+    inicioCurso: { type: 'string', format: 'date-time', nullable: true },
+    fimCurso: { type: 'string', format: 'date-time', nullable: true },
     materias: {
       type: 'array',
       items: schemaMateria,

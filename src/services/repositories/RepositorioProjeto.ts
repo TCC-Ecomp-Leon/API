@@ -354,8 +354,8 @@ const atualizarCurso = (
       { key: identificadorProjeto, value: idProjeto },
       { key: identificadorCurso, value: idCurso },
     ],
-    'cursos.0',
-    curso,
+    'cursos.$',
+    { ...curso, atualizadoEm: new Date() },
     db,
     session
   );
