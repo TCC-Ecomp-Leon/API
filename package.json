@@ -6,7 +6,7 @@
   "scripts": {
     "start": "ts-node-dev src/index.ts",
     "pretest": "ENV='TEST' ts-node-dev tests_e2e/test_data.ts ; ENV='TEST' ts-node src/mocks/index.ts",
-    "test": "ENV='TEST' jest"
+    "test": "ENV='TEST' jest --maxWorkers=1"
   },
   "jest": {
     "preset": "ts-jest",
