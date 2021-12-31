@@ -1,6 +1,6 @@
 import { changeEmailAndPasswordHandler } from '../../handlers/auth/changeEmailAndPassword';
-import Navigation from '../../structure/navigation';
+import { ProtectedNavigation } from '../../structure/navigation';
 
-export const changeEmailAndPasswordNavigation = new Navigation([
+export const changeEmailAndPasswordNavigation = ProtectedNavigation([
   changeEmailAndPasswordHandler,
 ]);

@@ -1,4 +1,4 @@
 import { criarCodigoHandler } from '../../handlers/codigoDeEntrada/criarCodigo';
-import Navigation from '../../structure/navigation';
+import { ProtectedNavigation } from '../../structure/navigation';
 
-export const criarCodigoNavigation = new Navigation([criarCodigoHandler]);
+export const criarCodigoNavigation = ProtectedNavigation([criarCodigoHandler]);

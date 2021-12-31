@@ -1,4 +1,6 @@
 import { deletarCodigoHandler } from '../../handlers/codigoDeEntrada/deletarCodigo';
-import Navigation from '../../structure/navigation';
+import { ProtectedNavigation } from '../../structure/navigation';
 
-export const deletarCodigoNavigation = new Navigation([deletarCodigoHandler]);
+export const deletarCodigoNavigation = ProtectedNavigation([
+  deletarCodigoHandler,
+]);
