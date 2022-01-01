@@ -13,6 +13,12 @@ router.put(
     cursoUniversitarioController
   )
 );
+router.delete(
+  baseUrl + '/:id',
+  cursoUniversitarioController.removerCursoUniversitario.bind(
+    cursoUniversitarioController
+  )
+);
 router.get(
   baseUrl,
   cursoUniversitarioController.getCursosUniversitarios.bind(

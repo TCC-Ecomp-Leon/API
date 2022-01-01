@@ -3,6 +3,7 @@ import { Express, Request, Response } from 'express';
 import { adicaoCursoUniversitarioNavigation } from '../navigations/cursoUniversitario/adicaoCursoUniversitario';
 import { atualizacaoCursoUniversitarioNavigation } from '../navigations/cursoUniversitario/atualizacaoCursoUniversitario';
 import { getCursosUniversitariosNavigation } from '../navigations/cursoUniversitario/getCursosUniversitarios';
+import { removerCursoUniversitarioNavigation } from '../navigations/cursoUniversitario/removerCursoUniversitario';
 
 export class CursoUniversitarioController extends Controller {
   adicaoCursoUniversitario(req: Request, res: Response) {
@@ -15,5 +16,9 @@ export class CursoUniversitarioController extends Controller {
 
   getCursosUniversitarios(req: Request, res: Response) {
     this.runNavigation(getCursosUniversitariosNavigation, req, res);
+  }
+
+  removerCursoUniversitario(req: Request, res: Response) {
+    this.runNavigation(removerCursoUniversitarioNavigation, req, res);
   }
 }

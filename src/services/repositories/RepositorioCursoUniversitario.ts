@@ -6,17 +6,27 @@ import Database from '../data/Database';
 
 const collection = 'CursoUniversitario';
 
+type CursoUniversitarioBanco = Omit<CursoUniversitario, 'cursoAnterior'> & {
+  cursoAnterior?: { id: string };
+};
+
 const addCursoUniversitario = async (
   curso: Omit<CursoUniversitario, 'id'>,
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<CursoUniversitario>> => {
-  const _curso: CursoUniversitario = {
+  const _curso: CursoUniversitarioBanco = {
     id: uuid(),
     ...curso,
+    cursoAnterior:
+      curso.cursoAnterior !== undefined
+        ? {
+            id: curso.cursoAnterior.id,
+          }
+        : undefined,
   };
 
-  const addResult = await Database.addData<CursoUniversitario>(
+  const addResult = await Database.addData<CursoUniversitarioBanco>(
     collection,
     _curso,
     db,
@@ -26,33 +36,101 @@ const addCursoUniversitario = async (
 
   return {
     success: true,
-    data: _curso,
+    data: {
+      ..._curso,
+      cursoAnterior: curso.cursoAnterior,
+    },
   };
 };
 
-const readCursoUniversitario = (
+const readCursoUniversitario = async (
   id: string,
   db: Db,
-  sesion: ClientSession
+  session: ClientSession
 ): Promise<DatabaseResult<CursoUniversitario>> => {
-  return Database.readData<CursoUniversitario>(
+  const readCurso = await Database.readData<CursoUniversitarioBanco>(
     collection,
     [{ key: 'id', value: id }],
     db,
-    sesion
+    session
   );
+
+  if (!readCurso.success) return readCurso;
+
+  const _curso = readCurso.data;
+  if (_curso.cursoAnterior !== undefined) {
+    const readCursoAnterior = await readCursoUniversitario(
+      _curso.cursoAnterior.id,
+      db,
+      session
+    );
+    if (!readCursoAnterior.success) {
+      return {
+        success: true,
+        data: {
+          ..._curso,
+          cursoAnterior: undefined,
+        },
+      };
+    }
+
+    return {
+      success: true,
+      data: {
+        ..._curso,
+        cursoAnterior: readCursoAnterior.data,
+      },
+    };
+  }
+
+  return {
+    success: true,
+    data: {
+      ..._curso,
+      cursoAnterior: undefined,
+    },
+  };
 };
 
-const readCursosUniversitarios = (
+const readCursosUniversitarios = async (
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<CursoUniversitario[]>> => {
-  return Database.readDatas<CursoUniversitario, CursoUniversitario>(
-    collection,
-    [],
-    db,
-    session
-  );
+  const resultDatabase = await Database.readDatas<
+    CursoUniversitarioBanco,
+    CursoUniversitarioBanco
+  >(collection, [], db, session);
+  if (!resultDatabase.success) return resultDatabase;
+
+  const cursosBanco = resultDatabase.data;
+  let mapaCursosBanco: { [idCurso: string]: CursoUniversitarioBanco } = {};
+  cursosBanco.forEach((curso) => {
+    mapaCursosBanco = {
+      ...mapaCursosBanco,
+      [curso.id]: curso,
+    };
+  });
+
+  const montarCurso = (curso: CursoUniversitarioBanco): CursoUniversitario => {
+    if (curso.cursoAnterior === undefined)
+      return {
+        ...curso,
+        cursoAnterior: undefined,
+      };
+    else {
+      const cursoAnterior = mapaCursosBanco[curso.cursoAnterior.id];
+      return {
+        ...curso,
+        cursoAnterior:
+          cursoAnterior !== undefined ? montarCurso(cursoAnterior) : undefined,
+      };
+    }
+  };
+
+  return {
+    success: true,
+    data: cursosBanco.map(montarCurso),
+  };
 };
 
 const updateCursoUniversitario = (
@@ -61,10 +139,18 @@ const updateCursoUniversitario = (
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<null>> => {
-  return Database.updatePartialData<CursoUniversitario>(
+  return Database.updatePartialData<CursoUniversitarioBanco>(
     collection,
     [{ key: 'id', value: id }],
-    curso,
+    {
+      ...curso,
+      cursoAnterior:
+        curso.cursoAnterior !== undefined
+          ? {
+              id: curso.cursoAnterior.id,
+            }
+          : undefined,
+    },
     db,
     session
   );
@@ -75,7 +161,7 @@ const deleteCursoUniversitario = (
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<null>> => {
-  return Database.remove<CursoUniversitario>(
+  return Database.remove<CursoUniversitarioBanco>(
     collection,
     [{ key: 'id', value: id }],
     db,
