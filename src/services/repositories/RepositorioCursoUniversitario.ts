@@ -10,7 +10,7 @@ const addCursoUniversitario = async (
   curso: Omit<CursoUniversitario, 'id'>,
   db: Db,
   session: ClientSession
-): Promise<DatabaseResult<string>> => {
+): Promise<DatabaseResult<CursoUniversitario>> => {
   const _curso: CursoUniversitario = {
     id: uuid(),
     ...curso,
@@ -26,7 +26,7 @@ const addCursoUniversitario = async (
 
   return {
     success: true,
-    data: _curso.id,
+    data: _curso,
   };
 };
 
@@ -40,6 +40,18 @@ const readCursoUniversitario = (
     [{ key: 'id', value: id }],
     db,
     sesion
+  );
+};
+
+const readCursosUniversitarios = (
+  db: Db,
+  session: ClientSession
+): Promise<DatabaseResult<CursoUniversitario[]>> => {
+  return Database.readDatas<CursoUniversitario, CursoUniversitario>(
+    collection,
+    [],
+    db,
+    session
   );
 };
 
@@ -74,6 +86,7 @@ const deleteCursoUniversitario = (
 export default {
   addCursoUniversitario,
   readCursoUniversitario,
+  readCursosUniversitarios,
   updateCursoUniversitario,
   deleteCursoUniversitario,
 };
