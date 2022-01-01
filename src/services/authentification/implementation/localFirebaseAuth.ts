@@ -228,7 +228,7 @@ const signInWithEmailAndPassword = async (
       data: {
         token: token,
         userId: user.userId,
-        emailVerified: false,
+        emailVerified: true,
       },
     };
   } catch (e) {

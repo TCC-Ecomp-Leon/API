@@ -17,5 +17,5 @@ export type CursoUniversitario = {
   /**
    * Um curso pode ter um curso anterior como todos os cursos específicos do BCT na UNIFESP SJC.
    */
-  cursoAnterior?: CursoUniversitario;
+  cursoAnterior: CursoUniversitario | null;
 };

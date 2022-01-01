@@ -30,7 +30,7 @@ export const adicaoCursoUniversitarioHandler = new Handler(
       CursoUniversitario,
       'id' | 'cursoAnterior'
     > & {
-      cursoAnterior?: { id: string };
+      cursoAnterior: { id: string } | null;
     };
 
     let cursoUniversitario: Omit<CursoUniversitario, 'id'>;
@@ -38,7 +38,7 @@ export const adicaoCursoUniversitarioHandler = new Handler(
     const service: DatabaseService<
       NavigationResult<{ cursoUniversitario: CursoUniversitario }>
     > = async (db, session) => {
-      if (informacoes.cursoAnterior !== undefined) {
+      if (informacoes.cursoAnterior !== null) {
         const idCursoAnterior = informacoes.cursoAnterior.id;
         const leituraCursoNecessario =
           await RepositorioCursoUniversitario.readCursoUniversitario(
@@ -61,7 +61,7 @@ export const adicaoCursoUniversitarioHandler = new Handler(
       } else {
         cursoUniversitario = {
           ...informacoes,
-          cursoAnterior: undefined,
+          cursoAnterior: null,
         };
       }
 

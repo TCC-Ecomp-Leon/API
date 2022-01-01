@@ -7,7 +7,7 @@ import Database from '../data/Database';
 const collection = 'CursoUniversitario';
 
 type CursoUniversitarioBanco = Omit<CursoUniversitario, 'cursoAnterior'> & {
-  cursoAnterior?: { id: string };
+  cursoAnterior: { id: string } | null;
 };
 
 const addCursoUniversitario = async (
@@ -19,11 +19,11 @@ const addCursoUniversitario = async (
     id: uuid(),
     ...curso,
     cursoAnterior:
-      curso.cursoAnterior !== undefined
+      curso.cursoAnterior !== null
         ? {
             id: curso.cursoAnterior.id,
           }
-        : undefined,
+        : null,
   };
 
   const addResult = await Database.addData<CursoUniversitarioBanco>(
@@ -58,7 +58,7 @@ const readCursoUniversitario = async (
   if (!readCurso.success) return readCurso;
 
   const _curso = readCurso.data;
-  if (_curso.cursoAnterior !== undefined) {
+  if (_curso.cursoAnterior !== null) {
     const readCursoAnterior = await readCursoUniversitario(
       _curso.cursoAnterior.id,
       db,
@@ -69,7 +69,7 @@ const readCursoUniversitario = async (
         success: true,
         data: {
           ..._curso,
-          cursoAnterior: undefined,
+          cursoAnterior: null,
         },
       };
     }
@@ -87,7 +87,7 @@ const readCursoUniversitario = async (
     success: true,
     data: {
       ..._curso,
-      cursoAnterior: undefined,
+      cursoAnterior: null,
     },
   };
 };
@@ -112,17 +112,17 @@ const readCursosUniversitarios = async (
   });
 
   const montarCurso = (curso: CursoUniversitarioBanco): CursoUniversitario => {
-    if (curso.cursoAnterior === undefined)
+    if (curso.cursoAnterior === null)
       return {
         ...curso,
-        cursoAnterior: undefined,
+        cursoAnterior: null,
       };
     else {
       const cursoAnterior = mapaCursosBanco[curso.cursoAnterior.id];
       return {
         ...curso,
         cursoAnterior:
-          cursoAnterior !== undefined ? montarCurso(cursoAnterior) : undefined,
+          cursoAnterior !== undefined ? montarCurso(cursoAnterior) : null,
       };
     }
   };
@@ -146,9 +146,11 @@ const updateCursoUniversitario = (
       ...curso,
       cursoAnterior:
         curso.cursoAnterior !== undefined
-          ? {
-              id: curso.cursoAnterior.id,
-            }
+          ? curso.cursoAnterior !== null
+            ? {
+                id: curso.cursoAnterior.id,
+              }
+            : null
           : undefined,
     },
     db,

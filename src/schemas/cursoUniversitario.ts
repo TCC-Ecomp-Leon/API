@@ -8,7 +8,7 @@ const ajv = new Ajv({
 
 const cursoUniversitario: JSONSchemaType<
   Omit<CursoUniversitario, 'id' | 'cursoAnterior'> & {
-    cursoAnterior?: { id: string };
+    cursoAnterior: { id: string } | null;
   }
 > = {
   type: 'object',
@@ -26,14 +26,14 @@ const cursoUniversitario: JSONSchemaType<
       additionalProperties: true,
     },
   },
-  required: ['nome', 'descricao', 'semestresPrevistos'],
+  required: ['nome', 'descricao', 'semestresPrevistos', 'cursoAnterior'],
   additionalProperties: true,
 };
 
 const atualizacaoCursoUniversitario: JSONSchemaType<
   Partial<
     Omit<CursoUniversitario, 'id' | 'cursoAnterior'> & {
-      cursoAnterior?: { id: string };
+      cursoAnterior: { id: string } | null;
     }
   >
 > = {

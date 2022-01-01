@@ -22,38 +22,54 @@ export const atualizacaoCursoUniversitarioHandler = new Handler(
       };
     }
 
+    if (body.cursoAnterior?.id === idCursoUniversitario) {
+      return {
+        status: 400,
+        body: {
+          error: 'Um curso não pode ter como anterior ele mesmo',
+        },
+      };
+    }
+
     const service: DatabaseService<NavigationResult<null>> = async (
       db,
       session
     ) => {
       const informacoes = body as Partial<
         Omit<CursoUniversitario, 'id' | 'cursoAnterior'> & {
-          cursoAnterior?: { id: string };
+          cursoAnterior: { id: string } | null;
         }
       >;
 
       let cursoUniversitario: Partial<CursoUniversitario>;
 
       if (informacoes.cursoAnterior !== undefined) {
-        const idCursoAnterior = informacoes.cursoAnterior.id;
-        const leituraCursoNecessario =
-          await RepositorioCursoUniversitario.readCursoUniversitario(
-            idCursoAnterior,
-            db,
-            session
-          );
-        if (!leituraCursoNecessario.success) {
-          return {
-            status: 404,
-            body: {
-              error: 'DATA_NOT_FOUND',
-            },
+        if (informacoes.cursoAnterior !== null) {
+          const idCursoAnterior = informacoes.cursoAnterior.id;
+          const leituraCursoNecessario =
+            await RepositorioCursoUniversitario.readCursoUniversitario(
+              idCursoAnterior,
+              db,
+              session
+            );
+          if (!leituraCursoNecessario.success) {
+            return {
+              status: 404,
+              body: {
+                error: 'DATA_NOT_FOUND',
+              },
+            };
+          }
+          cursoUniversitario = {
+            ...informacoes,
+            cursoAnterior: leituraCursoNecessario.data,
+          };
+        } else {
+          cursoUniversitario = {
+            ...informacoes,
+            cursoAnterior: null,
           };
         }
-        cursoUniversitario = {
-          ...informacoes,
-          cursoAnterior: leituraCursoNecessario.data,
-        };
       } else {
         cursoUniversitario = {
           ...informacoes,
