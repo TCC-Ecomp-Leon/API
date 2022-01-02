@@ -4,6 +4,7 @@ import {
 } from '../../config/database';
 import { Duvida, Materia, Perfil, RegraPerfil } from '../../models';
 import { DuvidaValidator, InformacoesDuvida } from '../../schemas/duvida';
+import RepositorioCursoUniversitario from '../../services/repositories/RepositorioCursoUniversitario';
 import RepositorioDuvida from '../../services/repositories/RepositorioDuvida';
 import Handler from '../../structure/handler';
 import {
@@ -72,6 +73,22 @@ export const criarDuvidaHandler = new Handler(
       db,
       session
     ) => {
+      if (idCursoUniversitario !== null) {
+        const leituraCursoUniversitario =
+          await RepositorioCursoUniversitario.readCursoUniversitario(
+            idCursoUniversitario,
+            db,
+            session
+          );
+        if (!leituraCursoUniversitario.success) {
+          return {
+            status: 404,
+            body: {
+              error: 'CURSO_NAO_ENCONTRADO',
+            },
+          };
+        }
+      }
       const result = await RepositorioDuvida.adicionarDuvida(
         titulo,
         descricao,
