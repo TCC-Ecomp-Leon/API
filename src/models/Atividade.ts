@@ -18,6 +18,7 @@ type InformacoesAtividade = {
    * Informação que será preenchida pela API.
    */
   criadoEm: Date;
+  idProjeto: string;
   /**
    * Identificador do curso ao qual a atividade está atrelada.
    * Necessário validar se o curso é válido.
@@ -36,7 +37,7 @@ type InformacoesAtividade = {
  */
 export type QuestaoAlternativa = {
   idQuestao: string;
-  enunciado: number;
+  enunciado: string;
   peso: number;
   alternativas: { item: string; value: boolean }[];
 };
@@ -46,7 +47,7 @@ export type QuestaoAlternativa = {
  */
 export type QuestaoDissertativa = {
   idQuestao: string;
-  enunciado: number;
+  enunciado: string;
   peso: number;
   respostaEsperada:
     | { foto: false; texto: string }
