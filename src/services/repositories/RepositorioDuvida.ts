@@ -63,6 +63,13 @@ const readDuvida = (
   );
 };
 
+const readDuvidas = (
+  db: Db,
+  session: ClientSession
+): Promise<DatabaseResult<Duvida[]>> => {
+  return Database.readDatas<Duvida, Duvida>(collection, [], db, session);
+};
+
 const readDuvidasEspecificas = (
   key: keyof Duvida,
   value: any,
@@ -72,6 +79,42 @@ const readDuvidasEspecificas = (
   return Database.readDatas<Duvida, Duvida>(
     collection,
     [{ key: key, value: value }],
+    db,
+    session
+  );
+};
+
+const readDuvidasComMensagensDeUmUsuario = (
+  idPerfil: string,
+  db: Db,
+  session: ClientSession
+): Promise<DatabaseResult<Duvida[]>> => {
+  return Database.readDatas<Duvida, Duvida>(
+    collection,
+    [{ key: 'mensagens.idPerfil', value: idPerfil }],
+    db,
+    session
+  );
+};
+
+const adicionarMensagem = (
+  idDuvida: string,
+  idPerfil: string,
+  mensagem: string,
+  db: Db,
+  session: ClientSession
+): Promise<DatabaseResult<null>> => {
+  const campoMensagem: keyof Duvida = 'mensagens';
+  const mensagemFechar: Duvida['mensagens'][0] = {
+    idPerfil: idPerfil,
+    mensagem: mensagem,
+    horario: new Date(),
+  };
+  return Database.updatePushData<Duvida, Duvida['mensagens'][0]>(
+    collection,
+    [{ key: 'id', value: idDuvida }],
+    campoMensagem,
+    mensagemFechar,
     db,
     session
   );
@@ -117,6 +160,9 @@ const fecharDuvida = async (
 export default {
   adicionarDuvida,
   readDuvida,
+  readDuvidas,
   readDuvidasEspecificas,
+  readDuvidasComMensagensDeUmUsuario,
+  adicionarMensagem,
   fecharDuvida,
 };
