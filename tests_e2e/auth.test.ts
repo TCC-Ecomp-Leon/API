@@ -93,13 +93,20 @@ test('Tentativa de entrar com o usuário e senha registrados', async () => {
   perfilRegistrado = perfil;
 });
 
-// test('Obtenção de perfil usando o token da requisição de login', async () => {
-//   const result = await request(app)
-//     .get(endpoint)
-//     .set(`Authorization`, `Bearer ${loginToken}`);
+test('Login como universitário', async () => {
+  const email = 'universitario1@unifesp.br';
+  const password = 'universitario1@unifesp';
 
-//   expect(result.statusCode).toStrictEqual(200);
+  const result = await request(app).put(endpoint).send({
+    email: email,
+    password: password,
+  });
 
-//   const perfil = result.body['profile'] as Perfil;
-//   expect(perfil).toStrictEqual(perfilRegistrado);
-// });
+  expect(result.statusCode).toBe(200);
+
+  const perfil = result.body['profile'] as Perfil;
+  expect(perfil.regra === RegraPerfil.Geral);
+  if (perfil.regra !== RegraPerfil.Geral) throw Error('');
+
+  expect(perfil.universitario.universitario).toStrictEqual(true);
+});
