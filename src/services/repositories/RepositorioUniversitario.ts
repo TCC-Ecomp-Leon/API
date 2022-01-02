@@ -44,7 +44,16 @@ const readInformacoesUniversitario = async (
         db,
         session
       );
-    if (!informacoes.success) return informacoes;
+    if (!informacoes.success)
+      return {
+        success: true,
+        data: {
+          universitario: true,
+          graduacao: undefined,
+          email: email,
+          atividadesQueColaborou: [],
+        },
+      };
 
     return {
       success: true,

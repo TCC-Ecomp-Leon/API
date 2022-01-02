@@ -107,4 +107,15 @@ const perfisGerais: {
     },
     password: 'user3@test',
   },
+  {
+    perfil: {
+      email: 'universitario1@unifesp.br',
+      nome: 'Universitário 1',
+      telefone: 12000000000,
+      entradaEm: new Date(),
+      fotoPerfil: assets.imgPerfil,
+      regra: RegraPerfil.Geral,
+    },
+    password: 'universitario1@unifesp',
+  },
 ];
