@@ -25,14 +25,14 @@ import RepositorioBancoDeQuestoes from './RepositorioBancoDeQuestoes';
 
 const collection = 'RespostaAtividade';
 
-type EstruturaRespostaAlternativa = Omit<
+export type EstruturaRespostaAlternativa = Omit<
   RespostaAtividade & { tipo: TipoAtividade.Alternativa },
   'encerrada'
 >;
-type EstruturaRespostaDissertativa = RespostaAtividade & {
+export type EstruturaRespostaDissertativa = RespostaAtividade & {
   tipo: TipoAtividade.Dissertativa;
 };
-type EstruturaRespostaBancoDeQuestoes = RespostaAtividade & {
+export type EstruturaRespostaBancoDeQuestoes = RespostaAtividade & {
   tipo: TipoAtividade.BancoDeQuestoes;
 };
 
@@ -131,21 +131,14 @@ const responderAtividadeBancoDeQuestoes = async (
   };
 };
 
-const lerResposta = async (
-  id: string,
+const montarReposta = async (
+  resposta:
+    | EstruturaRespostaAlternativa
+    | EstruturaRespostaDissertativa
+    | EstruturaRespostaDissertativa,
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<RespostaAtividade>> => {
-  const dado = await Database.readData<
-    | EstruturaRespostaAlternativa
-    | EstruturaRespostaDissertativa
-    | EstruturaRespostaDissertativa
-  >(collection, [{ key: 'id', value: id }], db, session);
-
-  if (!dado.success) return dado;
-
-  const resposta = dado.data;
-
   if (resposta.tipo === TipoAtividade.Alternativa) {
     const leituraAtividade = await RepositorioAtividade.lerAtividade(
       resposta.idAtividade,
@@ -214,6 +207,104 @@ const lerResposta = async (
       data: resposta,
     };
   }
+};
+
+const lerResposta = async (
+  id: string,
+  db: Db,
+  session: ClientSession
+): Promise<DatabaseResult<RespostaAtividade>> => {
+  const dado = await Database.readData<
+    | EstruturaRespostaAlternativa
+    | EstruturaRespostaDissertativa
+    | EstruturaRespostaDissertativa
+  >(collection, [{ key: 'id', value: id }], db, session);
+
+  if (!dado.success) return dado;
+
+  const resposta = dado.data;
+
+  return montarReposta(resposta, db, session);
+};
+
+const lerRespostas = async (
+  db: Db,
+  session: ClientSession
+): Promise<DatabaseResult<RespostaAtividade[]>> => {
+  const dados = await Database.readCollection<
+    | EstruturaRespostaAlternativa
+    | EstruturaRespostaDissertativa
+    | EstruturaRespostaDissertativa
+  >(collection, db, session);
+
+  if (!dados.success) return dados;
+
+  const dadosMontados = await Promise.all(
+    dados.data.map(async (info) => {
+      return await montarReposta(info, db, session);
+    })
+  );
+
+  const respostas: RespostaAtividade[] = [];
+
+  for (let i = 0; i < dadosMontados.length; i++) {
+    const dadoMontado = dadosMontados[i];
+    if (!dadoMontado.success) {
+      return dadoMontado;
+    }
+    respostas.push(dadoMontado.data);
+  }
+
+  return {
+    success: true,
+    data: respostas,
+  };
+};
+
+const lerRespostasEspecificas = async (
+  key: keyof RespostaAtividade,
+  value: any,
+  db: Db,
+  session: ClientSession
+): Promise<DatabaseResult<RespostaAtividade[]>> => {
+  type tipoDado =
+    | EstruturaRespostaAlternativa
+    | EstruturaRespostaDissertativa
+    | EstruturaRespostaDissertativa;
+  const dados = await Database.readDatas<tipoDado, tipoDado>(
+    collection,
+    [
+      {
+        key: key,
+        value: value,
+      },
+    ],
+    db,
+    session
+  );
+
+  if (!dados.success) return dados;
+
+  const dadosMontados = await Promise.all(
+    dados.data.map(async (info) => {
+      return await montarReposta(info, db, session);
+    })
+  );
+
+  const respostas: RespostaAtividade[] = [];
+
+  for (let i = 0; i < dadosMontados.length; i++) {
+    const dadoMontado = dadosMontados[i];
+    if (!dadoMontado.success) {
+      return dadoMontado;
+    }
+    respostas.push(dadoMontado.data);
+  }
+
+  return {
+    success: true,
+    data: respostas,
+  };
 };
 
 const corrigirQuestaoDissertativa = (
@@ -383,6 +474,8 @@ export default {
   responderAtividadeDissertativa,
   responderAtividadeBancoDeQuestoes,
   lerResposta,
+  lerRespostas,
+  lerRespostasEspecificas,
   corrigirQuestaoDissertativa,
   requisitarRevisaoAtividadeDissertativa,
   finalizarRevisaoAtividadeDissertativa,

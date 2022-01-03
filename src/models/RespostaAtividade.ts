@@ -72,6 +72,9 @@ export type CorrecaoDissertativa = {
    */
   status: StatusRespostaDissertativa;
   comentarios: string;
+  idProjeto: string;
+  idCurso: string | null;
+  idMateria: string | null;
 };
 
 /**
@@ -80,7 +83,7 @@ export type CorrecaoDissertativa = {
 export type QuestaoBancoDeQuestoes = {
   idAtividade: string;
   idQuestao: string;
-  enunciado: number;
+  enunciado: string;
   alternativas: { item: string; value: boolean }[];
 };
 
