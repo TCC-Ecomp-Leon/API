@@ -5,206 +5,179 @@ import {
   RespostaAtividade,
   RespostaAlternativa,
   RespostaDissertativa,
-  StatusRespostaDissertativa,
   CorrecaoDissertativa,
   QuestaoBancoDeQuestoes,
   Atividade,
   TipoAtividade,
-  QuestaoDissertativa,
   QuestaoAlternativa,
   AvaliacaoRespostaBancoDeQuestoes,
-  BancoDeQuestoes,
 } from '../../models';
 import { DatabaseResult } from '../../structure/databaseResult';
-import Database, { SearchType } from '../data/Database';
-import RepositorioAtividade from './RepositorioAtividade';
+import Database from '../data/Database';
 import _ from 'lodash';
 
-import { collection as collectionAtividade } from './RepositorioAtividade';
 import RepositorioBancoDeQuestoes from './RepositorioBancoDeQuestoes';
+import RepositorioAtividade from './RepositorioAtividade';
 
 const collection = 'RespostaAtividade';
 
-export type EstruturaRespostaAlternativa = Omit<
-  RespostaAtividade & { tipo: TipoAtividade.Alternativa },
-  'encerrada'
->;
-export type EstruturaRespostaDissertativa = RespostaAtividade & {
-  tipo: TipoAtividade.Dissertativa;
-};
-export type EstruturaRespostaBancoDeQuestoes = RespostaAtividade & {
-  tipo: TipoAtividade.BancoDeQuestoes;
-};
-
 const responderAtividadeAlternativa = async (
+  idProjeto: string,
+  idCurso: string | null,
+  idMateria: string | null,
   idAtividade: string,
   idAluno: string,
   respostas: RespostaAlternativa[],
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<string>> => {
-  const atividade: EstruturaRespostaAlternativa = {
+  const resposta: RespostaAtividade = {
     id: uuid(),
+    idProjeto: idProjeto,
+    idCurso: idCurso,
+    idMateria: idMateria,
     idAtividade: idAtividade,
-    respondidoEm: new Date(),
     tipo: TipoAtividade.Alternativa,
     respostas: respostas,
     idAluno: idAluno,
+    respondidoEm: new Date(),
+    encerrada: false,
   };
 
-  const add = await Database.addData<EstruturaRespostaAlternativa>(
+  const result = await Database.addData<RespostaAtividade>(
     collection,
-    atividade,
+    resposta,
     db,
     session
   );
 
-  if (!add.success) return add;
+  if (!result.success) return result;
 
   return {
     success: true,
-    data: atividade.id,
+    data: resposta.id,
   };
 };
 
 const responderAtividadeDissertativa = async (
+  idProjeto: string,
+  idCurso: string | null,
+  idMateria: string | null,
   idAtividade: string,
   idAluno: string,
   respostas: RespostaDissertativa[],
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<string>> => {
-  const atividade: EstruturaRespostaDissertativa = {
+  const resposta: RespostaAtividade = {
     id: uuid(),
+    idProjeto: idProjeto,
+    idCurso: idCurso,
+    idMateria: idMateria,
     idAtividade: idAtividade,
-    respondidoEm: new Date(),
     tipo: TipoAtividade.Dissertativa,
     respostas: respostas,
     idAluno: idAluno,
+    respondidoEm: new Date(),
     corrigida: false,
   };
 
-  const add = await Database.addData<EstruturaRespostaDissertativa>(
+  const result = await Database.addData<RespostaAtividade>(
     collection,
-    atividade,
+    resposta,
     db,
     session
   );
 
-  if (!add.success) return add;
+  if (!result.success) return result;
 
   return {
     success: true,
-    data: atividade.id,
+    data: resposta.id,
   };
 };
 
 const responderAtividadeBancoDeQuestoes = async (
+  idProjeto: string,
+  idCurso: string | null,
+  idMateria: string | null,
   idAtividade: string,
   idUniversitario: string,
   respostas: QuestaoBancoDeQuestoes[],
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<string>> => {
-  const atividade: EstruturaRespostaBancoDeQuestoes = {
+  const resposta: RespostaAtividade = {
     id: uuid(),
+    idProjeto: idProjeto,
+    idCurso: idCurso,
+    idMateria: idMateria,
     idAtividade: idAtividade,
-    respondidoEm: new Date(),
     tipo: TipoAtividade.BancoDeQuestoes,
-    idUniversitario: idUniversitario,
     respostas: respostas,
+    idUniversitario: idUniversitario,
+    respondidoEm: new Date(),
     avaliada: false,
   };
 
-  const add = await Database.addData<EstruturaRespostaBancoDeQuestoes>(
+  const result = await Database.addData<RespostaAtividade>(
     collection,
-    atividade,
+    resposta,
     db,
     session
   );
 
-  if (!add.success) return add;
+  if (!result.success) return result;
 
   return {
     success: true,
-    data: atividade.id,
+    data: resposta.id,
   };
 };
 
-const montarReposta = async (
-  resposta:
-    | EstruturaRespostaAlternativa
-    | EstruturaRespostaDissertativa
-    | EstruturaRespostaDissertativa,
-  db: Db,
-  session: ClientSession
-): Promise<DatabaseResult<RespostaAtividade>> => {
-  if (resposta.tipo === TipoAtividade.Alternativa) {
-    const leituraAtividade = await RepositorioAtividade.lerAtividade(
-      resposta.idAtividade,
-      db,
-      session
-    );
-    if (!leituraAtividade.success) return leituraAtividade;
+const completarAtividadeAlternativa = (
+  resposta: RespostaAtividade & { tipo: TipoAtividade.Alternativa },
+  atividade: Atividade & { tipoAtividade: TipoAtividade.Alternativa }
+): RespostaAtividade & { tipo: TipoAtividade.Alternativa } => {
+  if (new Date() > atividade.fechamentoRespostas) {
+    let somatorio = 0.0;
+    let somatorioPesos = 0.0;
+    const notaReferencia = atividade.notaReferencia;
 
-    const atividade = leituraAtividade.data;
-    if (atividade.tipoAtividade !== TipoAtividade.Alternativa) {
-      throw Error(
-        'Atividade que não é alternativa configurada com resposta alternativa'
-      );
-    }
+    resposta.respostas.forEach((resposta) => {
+      const { idQuestao, alternativas } = resposta;
 
-    if (new Date() > atividade.fechamentoRespostas) {
-      let somatorio = 0.0;
-      let somatorioPesos = 0.0;
-      const notaReferencia = atividade.notaReferencia;
+      const questaoConfigurada: QuestaoAlternativa | undefined =
+        atividade.itens.find((questao) => questao.idQuestao === idQuestao);
+      if (questaoConfigurada === undefined) {
+        throw Error(
+          'Não foi possível encontrar a questão respondida na atividade'
+        );
+      }
 
-      resposta.respostas.forEach((resposta) => {
-        const { idQuestao, alternativas } = resposta;
+      const alternativasConfiguradas = questaoConfigurada.alternativas;
+      if (
+        _.isEqual(
+          alternativas.map((alternativa) => alternativa.value),
+          alternativasConfiguradas.map((alternativa) => alternativa.value)
+        )
+      ) {
+        somatorio = somatorio + questaoConfigurada.peso;
+      }
+      somatorioPesos = somatorioPesos + questaoConfigurada.peso;
+    });
 
-        const questaoConfigurada: QuestaoAlternativa | undefined =
-          atividade.itens.find((questao) => questao.idQuestao === idQuestao);
-        if (questaoConfigurada === undefined) {
-          throw Error(
-            'Não foi possível encontrar a questão respondida na atividade'
-          );
-        }
+    const nota = (somatorio / somatorioPesos) * notaReferencia;
 
-        const alternativasConfiguradas = questaoConfigurada.alternativas;
-        if (
-          _.isEqual(
-            alternativas.map((alternativa) => alternativa.value),
-            alternativasConfiguradas.map((alternativa) => alternativa.value)
-          )
-        ) {
-          somatorio = somatorio + questaoConfigurada.peso;
-        }
-        somatorioPesos = somatorioPesos + questaoConfigurada.peso;
-      });
-
-      const nota = (somatorio / somatorioPesos) * notaReferencia;
-
-      return {
-        success: true,
-        data: {
-          ...resposta,
-          encerrada: true,
-          nota: nota,
-        },
-      };
-    } else {
-      return {
-        success: true,
-        data: {
-          ...resposta,
-          encerrada: false,
-        },
-      };
-    }
+    return {
+      ...resposta,
+      encerrada: true,
+      nota: nota,
+    };
   } else {
     return {
-      success: true,
-      data: resposta,
+      ...resposta,
+      encerrada: false,
     };
   }
 };
@@ -214,50 +187,95 @@ const lerResposta = async (
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<RespostaAtividade>> => {
-  const dado = await Database.readData<
-    | EstruturaRespostaAlternativa
-    | EstruturaRespostaDissertativa
-    | EstruturaRespostaDissertativa
-  >(collection, [{ key: 'id', value: id }], db, session);
+  const campoId: keyof RespostaAtividade = 'id';
+  const leitura = await Database.readData<RespostaAtividade>(
+    collection,
+    [
+      {
+        key: campoId,
+        value: id,
+      },
+    ],
+    db,
+    session
+  );
 
-  if (!dado.success) return dado;
+  if (!leitura.success) return leitura;
 
-  const resposta = dado.data;
+  const dado = leitura.data;
+  if (dado.tipo === TipoAtividade.Alternativa) {
+    const leituraAtividade = await RepositorioAtividade.lerAtividade(
+      dado.idAtividade,
+      db,
+      session
+    );
 
-  return montarReposta(resposta, db, session);
+    if (!leituraAtividade.success) return leituraAtividade;
+
+    const atividade = leituraAtividade.data;
+    if (atividade.tipoAtividade !== TipoAtividade.Alternativa) {
+      return {
+        success: false,
+        error: Error('Resposta alternativa de atividade não alternativa'),
+      };
+    }
+
+    return {
+      success: true,
+      data: completarAtividadeAlternativa(dado, atividade),
+    };
+  } else {
+    return {
+      success: true,
+      data: dado,
+    };
+  }
 };
 
 const lerRespostas = async (
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<RespostaAtividade[]>> => {
-  const dados = await Database.readCollection<
-    | EstruturaRespostaAlternativa
-    | EstruturaRespostaDissertativa
-    | EstruturaRespostaDissertativa
-  >(collection, db, session);
-
-  if (!dados.success) return dados;
-
-  const dadosMontados = await Promise.all(
-    dados.data.map(async (info) => {
-      return await montarReposta(info, db, session);
-    })
+  const leitura = await Database.readCollection<RespostaAtividade>(
+    collection,
+    db,
+    session
   );
 
-  const respostas: RespostaAtividade[] = [];
+  if (!leitura.success) return leitura;
 
-  for (let i = 0; i < dadosMontados.length; i++) {
-    const dadoMontado = dadosMontados[i];
-    if (!dadoMontado.success) {
-      return dadoMontado;
+  const dados = leitura.data;
+  const lista: RespostaAtividade[] = [];
+
+  for (let i = 0; i < dados.length; i++) {
+    const dado = dados[i];
+
+    if (dado.tipo === TipoAtividade.Alternativa) {
+      const leituraAtividade = await RepositorioAtividade.lerAtividade(
+        dado.idAtividade,
+        db,
+        session
+      );
+
+      if (!leituraAtividade.success) return leituraAtividade;
+
+      const atividade = leituraAtividade.data;
+      if (atividade.tipoAtividade !== TipoAtividade.Alternativa) {
+        return {
+          success: false,
+          error: Error('Resposta alternativa de atividade não alternativa'),
+        };
+      }
+
+      lista.push(completarAtividadeAlternativa(dado, atividade));
+    } else {
+      lista.push(dado);
     }
-    respostas.push(dadoMontado.data);
   }
 
   return {
     success: true,
-    data: respostas,
+    data: lista,
   };
 };
 
@@ -267,11 +285,10 @@ const lerRespostasEspecificas = async (
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<RespostaAtividade[]>> => {
-  type tipoDado =
-    | EstruturaRespostaAlternativa
-    | EstruturaRespostaDissertativa
-    | EstruturaRespostaDissertativa;
-  const dados = await Database.readDatas<tipoDado, tipoDado>(
+  const leitura = await Database.readDatas<
+    RespostaAtividade,
+    RespostaAtividade
+  >(
     collection,
     [
       {
@@ -283,31 +300,44 @@ const lerRespostasEspecificas = async (
     session
   );
 
-  if (!dados.success) return dados;
+  if (!leitura.success) return leitura;
 
-  const dadosMontados = await Promise.all(
-    dados.data.map(async (info) => {
-      return await montarReposta(info, db, session);
-    })
-  );
+  const dados = leitura.data;
+  const lista: RespostaAtividade[] = [];
 
-  const respostas: RespostaAtividade[] = [];
+  for (let i = 0; i < dados.length; i++) {
+    const dado = dados[i];
 
-  for (let i = 0; i < dadosMontados.length; i++) {
-    const dadoMontado = dadosMontados[i];
-    if (!dadoMontado.success) {
-      return dadoMontado;
+    if (dado.tipo === TipoAtividade.Alternativa) {
+      const leituraAtividade = await RepositorioAtividade.lerAtividade(
+        dado.idAtividade,
+        db,
+        session
+      );
+
+      if (!leituraAtividade.success) return leituraAtividade;
+
+      const atividade = leituraAtividade.data;
+      if (atividade.tipoAtividade !== TipoAtividade.Alternativa) {
+        return {
+          success: false,
+          error: Error('Resposta alternativa de atividade não alternativa'),
+        };
+      }
+
+      lista.push(completarAtividadeAlternativa(dado, atividade));
+    } else {
+      lista.push(dado);
     }
-    respostas.push(dadoMontado.data);
   }
 
   return {
     success: true,
-    data: respostas,
+    data: lista,
   };
 };
 
-const corrigirQuestaoDissertativa = (
+const corrigirAtividadeDissertativa = (
   id: string,
   idPerfil: string,
   nota: number,
@@ -315,10 +345,11 @@ const corrigirQuestaoDissertativa = (
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<null>> => {
-  type Estrutura = EstruturaRespostaDissertativa & { corrigida: true };
-
-  const atualizacao: Partial<Estrutura> = {
-    id: id,
+  const campoId: keyof RespostaAtividade = 'id';
+  const atualizacao: Partial<RespostaAtividade> & {
+    tipo: TipoAtividade.Dissertativa;
+  } = {
+    tipo: TipoAtividade.Dissertativa,
     corrigida: true,
     horarioCorrecao: new Date(),
     idPerfilCorrecao: idPerfil,
@@ -327,9 +358,14 @@ const corrigirQuestaoDissertativa = (
     revisao: EstadoRevisao.Nenhum,
   };
 
-  return Database.updatePartialData<Atividade>(
+  return Database.updatePartialData<RespostaAtividade>(
     collection,
-    [{ key: 'id', value: id }],
+    [
+      {
+        key: campoId,
+        value: id,
+      },
+    ],
     atualizacao,
     db,
     session
@@ -341,44 +377,78 @@ const requisitarRevisaoAtividadeDissertativa = (
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<null>> => {
-  type Estrutura = EstruturaRespostaDissertativa & { corrigida: true };
-
-  const atualizacao: Partial<Estrutura> = {
+  const campoId: keyof RespostaAtividade = 'id';
+  const atualizacao: Partial<RespostaAtividade> & {
+    tipo: TipoAtividade.Dissertativa;
+  } = {
+    tipo: TipoAtividade.Dissertativa,
     revisao: EstadoRevisao.Requisitada,
     revisaoRequisitadaEm: new Date(),
   };
 
-  return Database.updatePartialData<Atividade>(
+  return Database.updatePartialData<RespostaAtividade>(
     collection,
-    [{ key: 'id', value: id }],
+    [
+      {
+        key: campoId,
+        value: id,
+      },
+    ],
     atualizacao,
     db,
     session
   );
 };
 
-const finalizarRevisaoAtividadeDissertativa = (
+const finalizarRevisaoAtividadeDissertativa = async (
   id: string,
-  notaRevisao: number,
-  notaAnteriorRevisao: number,
-  revisaoQuestoes: CorrecaoDissertativa[],
+  nota: number,
+  correcaoQuestoes: CorrecaoDissertativa[],
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<null>> => {
-  type Estrutura = EstruturaRespostaDissertativa & { corrigida: true };
+  const leituraRespostaAnterior = await lerResposta(id, db, session);
+  if (!leituraRespostaAnterior.success) return leituraRespostaAnterior;
 
-  const atualizacao: Partial<Estrutura> = {
-    id: id,
+  const respostaAnterior = leituraRespostaAnterior.data;
+  if (respostaAnterior.tipo !== TipoAtividade.Dissertativa) {
+    return {
+      success: false,
+      error: Error(
+        'Tentando finalizar a revisão de uma atividade não dissertativa'
+      ),
+    };
+  }
+  if (!respostaAnterior.corrigida) {
+    return {
+      success: false,
+      error: Error(
+        'Tentando finalizar a revisão de uma atividade ainda não corrigida'
+      ),
+    };
+  }
+
+  const campoId: keyof RespostaAtividade = 'id';
+  const atualizacao: Partial<RespostaAtividade> & {
+    tipo: TipoAtividade.Dissertativa;
+  } = {
+    tipo: TipoAtividade.Dissertativa,
+    nota: nota,
     revisao: EstadoRevisao.Finalizada,
     revisaoAtendidaEm: new Date(),
-    revisaoQuestoes: revisaoQuestoes,
-    notaRevisao: notaRevisao,
-    notaAnteriorRevisao: notaAnteriorRevisao,
+    revisaoQuestoes: correcaoQuestoes,
+    notaRevisao: nota,
+    notaAnteriorRevisao: respostaAnterior.nota,
   };
 
-  return Database.updatePartialData<Atividade>(
+  return Database.updatePartialData<RespostaAtividade>(
     collection,
-    [{ key: 'id', value: id }],
+    [
+      {
+        key: campoId,
+        value: id,
+      },
+    ],
     atualizacao,
     db,
     session
@@ -387,36 +457,36 @@ const finalizarRevisaoAtividadeDissertativa = (
 
 const avaliarRespostasBanco = async (
   id: string,
-  idAtividade: string,
-  idPerfilAvaliador: string,
+  idPerfil: string,
   avaliacoes: AvaliacaoRespostaBancoDeQuestoes,
   comentario: string,
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<null>> => {
+  const campoId: keyof RespostaAtividade = 'id';
+
+  const leituraResposta = await lerResposta(id, db, session);
+  if (!leituraResposta.success) return leituraResposta;
+
+  let resposta = leituraResposta.data;
+  if (resposta.tipo !== TipoAtividade.BancoDeQuestoes) {
+    return {
+      success: false,
+      error: Error(
+        'Tentando avaliar questões de banco de questão que não são desse tipo'
+      ),
+    };
+  }
+
   const readAtividade = await RepositorioAtividade.lerAtividade(
-    idAtividade,
+    resposta.idAtividade,
     db,
     session
   );
   if (!readAtividade.success) return readAtividade;
-
-  const readResposta = await lerResposta(id, db, session);
-  if (!readResposta.success) return readResposta;
-
   const atividade = readAtividade.data;
-  let resposta = readResposta.data;
-  if (
-    atividade.tipoAtividade !== TipoAtividade.BancoDeQuestoes ||
-    resposta.tipo !== TipoAtividade.BancoDeQuestoes
-  ) {
-    throw Error(
-      'Atividade ou resposta configuradas não sao do tipo banco de questões'
-    );
-  }
 
   const questoesBanco: QuestaoBancoDeQuestoes[] = [];
-
   avaliacoes.avaliacaoQuestoes.forEach((avaliacaoQuestao) => {
     const { idQuestao, aprovada } = avaliacaoQuestao;
 
@@ -437,15 +507,14 @@ const avaliarRespostasBanco = async (
     ...resposta,
     avaliada: true,
     avaliadaEm: new Date(),
-    avaliadaPor: idPerfilAvaliador,
+    avaliadaPor: idPerfil,
     ...avaliacoes,
-    comentario: comentario,
   };
 
   const atualizacaoResposta =
     await Database.updatePartialData<RespostaAtividade>(
-      collectionAtividade,
-      [{ key: 'id', value: resposta.id }],
+      collection,
+      [{ key: campoId, value: id }],
       resposta,
       db,
       session
@@ -454,9 +523,11 @@ const avaliarRespostasBanco = async (
   if (!atualizacaoResposta.success) return atualizacaoResposta;
 
   for (let i = 0; i < questoesBanco.length; i++) {
+    const questao = questoesBanco[i];
+
     const add = await RepositorioBancoDeQuestoes.adicionarQuestao(
       atividade,
-      questoesBanco[i],
+      questao,
       db,
       session
     );
@@ -476,7 +547,7 @@ export default {
   lerResposta,
   lerRespostas,
   lerRespostasEspecificas,
-  corrigirQuestaoDissertativa,
+  corrigirAtividadeDissertativa,
   requisitarRevisaoAtividadeDissertativa,
   finalizarRevisaoAtividadeDissertativa,
   avaliarRespostasBanco,
