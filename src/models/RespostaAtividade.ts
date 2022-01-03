@@ -20,6 +20,9 @@ type InformacoesRespostaAtividade = {
    * Quando foi respondida.
    */
   respondidoEm: Date;
+  idProjeto: string;
+  idCurso: string | null;
+  idMateria: string | null;
 };
 
 /**
