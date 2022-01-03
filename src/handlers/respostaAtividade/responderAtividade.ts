@@ -89,6 +89,9 @@ export const responderAtividadeHandler = new Handler(
 
       if (informacoesResposta.tipo === TipoAtividade.Alternativa) {
         result = await RepositorioResposta.responderAtividadeAlternativa(
+          atividade.idProjeto,
+          atividade.idCurso,
+          atividade.idMateria,
           idAtividade,
           userProfile.id,
           informacoesResposta.respostas,
@@ -97,6 +100,9 @@ export const responderAtividadeHandler = new Handler(
         );
       } else if (informacoesResposta.tipo === TipoAtividade.Dissertativa) {
         result = await RepositorioResposta.responderAtividadeDissertativa(
+          atividade.idProjeto,
+          atividade.idCurso,
+          atividade.idMateria,
           idAtividade,
           userProfile.id,
           informacoesResposta.respostas,
@@ -105,6 +111,9 @@ export const responderAtividadeHandler = new Handler(
         );
       } else if (informacoesResposta.tipo === TipoAtividade.BancoDeQuestoes) {
         result = await RepositorioResposta.responderAtividadeBancoDeQuestoes(
+          atividade.idProjeto,
+          atividade.idCurso,
+          atividade.idMateria,
           idAtividade,
           userProfile.id,
           informacoesResposta.respostas.map((info) => ({

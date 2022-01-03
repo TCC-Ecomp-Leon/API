@@ -6,7 +6,7 @@ export enum EstadoRevisao {
   Finalizada = 3,
 }
 
-type InformacoesRespostaAtividade = {
+export type InformacoesRespostaAtividade = {
   /**
    * Identificador da resposta da atividade.
    */

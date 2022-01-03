@@ -2,36 +2,28 @@ import Ajv, { JSONSchemaType } from 'ajv';
 import {
   BancoDeQuestoes,
   QuestaoBancoDeQuestoes,
+  RespostaAlternativa,
+  RespostaDissertativa,
   TipoAtividade,
 } from '../models';
-import {
-  EstruturaRespostaAlternativa,
-  EstruturaRespostaBancoDeQuestoes,
-  EstruturaRespostaDissertativa,
-} from '../services/repositories/RepositorioResposta';
 
 const ajv = new Ajv({
   allowUnionTypes: true,
   timestamp: 'date',
 });
 
-export type InformacoesRespostaAlternativa = Omit<
-  EstruturaRespostaAlternativa,
-  'id' | 'idAtividade' | 'respondidoEm' | 'idAluno'
->;
-export type InformacoesRespostaDissertativa = Omit<
-  EstruturaRespostaDissertativa,
-  'id' | 'idAtividade' | 'respondidoEm' | 'idAluno' | 'corrigida'
->;
-export type InformacoesRespostaBancoDeQuestoes = Omit<
-  EstruturaRespostaBancoDeQuestoes,
-  | 'id'
-  | 'idUniversitario'
-  | 'avaliada'
-  | 'idAtividade'
-  | 'respondidoEm'
-  | 'respostas'
-> & { respostas: Omit<QuestaoBancoDeQuestoes, 'idAtividade'>[] };
+export type InformacoesRespostaAlternativa = {
+  tipo: TipoAtividade.Alternativa;
+  respostas: RespostaAlternativa[];
+};
+export type InformacoesRespostaDissertativa = {
+  tipo: TipoAtividade.Dissertativa;
+  respostas: RespostaDissertativa[];
+};
+export type InformacoesRespostaBancoDeQuestoes = {
+  tipo: TipoAtividade.BancoDeQuestoes;
+  respostas: Omit<QuestaoBancoDeQuestoes, 'idAtividade'>[];
+};
 
 const _informacoesRespostaAlternativa: JSONSchemaType<InformacoesRespostaAlternativa> =
   {
