@@ -459,7 +459,6 @@ const avaliarRespostasBanco = async (
   id: string,
   idPerfil: string,
   avaliacoes: AvaliacaoRespostaBancoDeQuestoes,
-  comentario: string,
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<null>> => {

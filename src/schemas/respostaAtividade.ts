@@ -1,9 +1,11 @@
 import Ajv, { JSONSchemaType } from 'ajv';
 import {
+  AvaliacaoRespostaBancoDeQuestoes,
   BancoDeQuestoes,
   QuestaoBancoDeQuestoes,
   RespostaAlternativa,
   RespostaDissertativa,
+  StatusRespostaDissertativa,
   TipoAtividade,
 } from '../models';
 
@@ -142,3 +144,55 @@ const informacoesResposta: JSONSchemaType<InformacoesResposta> = {
 };
 
 export const RespostaAtividadeValidator = ajv.compile(informacoesResposta);
+
+export type InformacoesCorrecaoQuestoesDissertativas = {
+  idQuestao: string;
+  nota: number;
+  status: StatusRespostaDissertativa;
+  comentarios: string;
+}[];
+
+const correcaoQuestoesDissertativas: JSONSchemaType<InformacoesCorrecaoQuestoesDissertativas> =
+  {
+    type: 'array',
+    items: {
+      type: 'object',
+      properties: {
+        idQuestao: { type: 'string' },
+        nota: { type: 'number' },
+        status: { type: 'integer' },
+        comentarios: { type: 'string' },
+      },
+      required: ['idQuestao', 'nota', 'status', 'comentarios'],
+    },
+    additionalProperties: true,
+  };
+
+export const CorrecaoQuestoesDissertativasValidator = ajv.compile(
+  correcaoQuestoesDissertativas
+);
+
+const informacoesAvaliacaoBancoDeQuestoes: JSONSchemaType<AvaliacaoRespostaBancoDeQuestoes> =
+  {
+    type: 'object',
+    properties: {
+      comentario: { type: 'string' },
+      avaliacaoQuestoes: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            aprovada: { type: 'boolean' },
+            idQuestao: { type: 'string' },
+          },
+          required: ['aprovada', 'idQuestao'],
+        },
+      },
+    },
+    required: ['avaliacaoQuestoes', 'comentario'],
+    additionalProperties: true,
+  };
+
+export const InformacoesAvaliacaoBancoDeQuestaoValidator = ajv.compile(
+  informacoesAvaliacaoBancoDeQuestoes
+);

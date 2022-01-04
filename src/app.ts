@@ -9,6 +9,7 @@ import { router as codigoDeEntradaRouter } from './router/codigoDeEntrada';
 import { router as cursoUniversitarioRouter } from './router/cursoUniversitario';
 import { router as duvidaRouter } from './router/duvida';
 import { router as atividadeRouter } from './router/atividade';
+import { router as respostasAtividadesRouter } from './router/respostasAtividades';
 
 const app = express();
 app.use(json({ limit: '50mb' }));
@@ -22,5 +23,6 @@ app.use(codigoDeEntradaRouter);
 app.use(cursoUniversitarioRouter);
 app.use(duvidaRouter);
 app.use(atividadeRouter);
+app.use(respostasAtividadesRouter);
 
 export default app;
