@@ -4,6 +4,7 @@ import {
   Atividade,
   BancoDeQuestoes,
   QuestaoBancoDeQuestoes,
+  TipoAtividade,
 } from '../../models';
 import { DatabaseResult } from '../../structure/databaseResult';
 import Database, { SearchType } from '../data/Database';
@@ -12,7 +13,7 @@ import RepositorioAtividade from './RepositorioAtividade';
 const collection = 'BancoDeQuestoes';
 
 const adicionarQuestao = async (
-  atividade: Atividade,
+  atividade: Atividade & { tipoAtividade: TipoAtividade.BancoDeQuestoes },
   questao: QuestaoBancoDeQuestoes,
   db: Db,
   session: ClientSession
@@ -20,9 +21,11 @@ const adicionarQuestao = async (
   const banco: BancoDeQuestoes = {
     id: uuid(),
     criadoEm: new Date(),
+    idProjeto: atividade.idProjeto,
     idCurso: atividade.idCurso,
     idMateria: atividade.idMateria,
     questao: questao,
+    assuntos: atividade.assuntos,
   };
 
   const add = await Database.addData<BancoDeQuestoes>(
@@ -63,6 +66,26 @@ const lerQuestoes = (
   );
 };
 
+const lerQuestao = (
+  id: string,
+  db: Db,
+  session: ClientSession
+): Promise<DatabaseResult<BancoDeQuestoes>> => {
+  const campoId: keyof BancoDeQuestoes = 'id';
+
+  return Database.readData<BancoDeQuestoes>(
+    collection,
+    [
+      {
+        key: campoId,
+        value: id,
+      },
+    ],
+    db,
+    session
+  );
+};
+
 const removerQuestao = (
   id: string,
   db: Db,
@@ -91,9 +114,24 @@ const atualizarQuestao = (
   );
 };
 
+const lerQuestoesComFiltro = (
+  filtros: SearchType<BancoDeQuestoes>[],
+  db: Db,
+  session: ClientSession
+): Promise<DatabaseResult<BancoDeQuestoes[]>> => {
+  return Database.readDatas<BancoDeQuestoes, BancoDeQuestoes>(
+    collection,
+    filtros,
+    db,
+    session
+  );
+};
+
 export default {
   adicionarQuestao,
+  lerQuestao,
   lerQuestoes,
   atualizarQuestao,
   removerQuestao,
+  lerQuestoesComFiltro,
 };

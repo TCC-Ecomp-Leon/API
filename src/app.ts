@@ -10,6 +10,7 @@ import { router as cursoUniversitarioRouter } from './router/cursoUniversitario'
 import { router as duvidaRouter } from './router/duvida';
 import { router as atividadeRouter } from './router/atividade';
 import { router as respostasAtividadesRouter } from './router/respostasAtividades';
+import { router as bancoDeQuestoesRouter } from './router/bancoDeQuestoes';
 
 const app = express();
 app.use(json({ limit: '50mb' }));
@@ -24,5 +25,6 @@ app.use(cursoUniversitarioRouter);
 app.use(duvidaRouter);
 app.use(atividadeRouter);
 app.use(respostasAtividadesRouter);
+app.use(bancoDeQuestoesRouter);
 
 export default app;

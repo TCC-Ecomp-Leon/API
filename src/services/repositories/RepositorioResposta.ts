@@ -484,6 +484,14 @@ const avaliarRespostasBanco = async (
   );
   if (!readAtividade.success) return readAtividade;
   const atividade = readAtividade.data;
+  if (atividade.tipoAtividade !== TipoAtividade.BancoDeQuestoes) {
+    return {
+      success: false,
+      error: Error(
+        'Avaliação de resposta de banco de questẽos de atividade que não é desse tipo'
+      ),
+    };
+  }
 
   const questoesBanco: QuestaoBancoDeQuestoes[] = [];
   avaliacoes.avaliacaoQuestoes.forEach((avaliacaoQuestao) => {
