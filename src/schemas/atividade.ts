@@ -5,6 +5,8 @@ import addFormats from 'ajv-formats';
 const ajv = new Ajv({
   allowUnionTypes: true,
   timestamp: 'date',
+  strict: false,
+  strictTypes: false,
 });
 
 addFormats(ajv);

@@ -164,8 +164,8 @@ const correcaoQuestoesDissertativas: JSONSchemaType<InformacoesCorrecaoQuestoesD
         comentarios: { type: 'string' },
       },
       required: ['idQuestao', 'nota', 'status', 'comentarios'],
+      additionalProperties: true,
     },
-    additionalProperties: true,
   };
 
 export const CorrecaoQuestoesDissertativasValidator = ajv.compile(
