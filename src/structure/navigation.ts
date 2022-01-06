@@ -53,13 +53,14 @@ export default class Navigation {
 const getProfile = async (
   userId: string,
   email: string,
+  verifiedEmail: boolean,
   session: ClientSession,
   db: Db
 ): Promise<DatabaseResult<Perfil | null>> => {
   const profile = await RepositorioPerfil.readPerfil(
     userId,
     email,
-    false,
+    verifiedEmail,
     db,
     session
   );

@@ -46,6 +46,7 @@ export type InformacoesPerfil = {
 };
 
 export type ColaboracaoAtividade = {
+  idResposta: string;
   /**
    * Id da atividade em que ele colaborou.
    */

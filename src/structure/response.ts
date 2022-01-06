@@ -43,7 +43,8 @@ export type OperationResult<T> =
         error:
           | 'CANT_REGISTER_THAT_PROFILE'
           | 'PROJETO_JA_APROVADO'
-          | 'CODIGO_JA_USADO';
+          | 'CODIGO_JA_USADO'
+          | 'REVISAO_JA_APROVADA';
       };
     }
   | {

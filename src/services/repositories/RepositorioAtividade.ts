@@ -19,6 +19,7 @@ export enum SituacaoAtividadeLeitura {
 
 const addAtividadeAlternativa = async (
   nome: string,
+  idProjeto: string,
   idCurso: string,
   idMateria: string | null,
   aberturaRespostas: Date,
@@ -32,6 +33,7 @@ const addAtividadeAlternativa = async (
     id: uuid(),
     nome: nome,
     criadoEm: new Date(),
+    idProjeto: idProjeto,
     idCurso: idCurso,
     idMateria: idMateria,
     tipoAtividade: TipoAtividade.Alternativa,
@@ -57,6 +59,7 @@ const addAtividadeAlternativa = async (
 
 const addAtividadeDissertativa = async (
   nome: string,
+  idProjeto: string,
   idCurso: string,
   idMateria: string | null,
   aberturaRespostas: Date,
@@ -72,6 +75,7 @@ const addAtividadeDissertativa = async (
     id: uuid(),
     nome: nome,
     criadoEm: new Date(),
+    idProjeto: idProjeto,
     idCurso: idCurso,
     idMateria: idMateria,
     tipoAtividade: TipoAtividade.Dissertativa,
@@ -100,6 +104,7 @@ const addAtividadeDissertativa = async (
 
 const addAtividadeBancoDeQuestoes = async (
   nome: string,
+  idProjeto: string,
   idCurso: string,
   idMateria: string | null,
   aberturaRespostas: Date,
@@ -113,6 +118,7 @@ const addAtividadeBancoDeQuestoes = async (
     id: uuid(),
     nome: nome,
     criadoEm: new Date(),
+    idProjeto: idProjeto,
     idCurso: idCurso,
     idMateria: idMateria,
     tipoAtividade: TipoAtividade.BancoDeQuestoes,
@@ -150,23 +156,21 @@ const lerAtividade = async (
   );
 };
 
-const lerAtividadesCurso = async (
-  idCurso: string,
-  situacao: SituacaoAtividadeLeitura = SituacaoAtividadeLeitura.aberta,
+const lerAtividades = async (
+  situacao: SituacaoAtividadeLeitura | undefined,
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<Atividade[]>> => {
-  const campoCurso: keyof Atividade = 'idCurso';
-  const campoFechamento = 'fechamentoRespostas';
+  const campoFechamento: keyof Atividade = 'fechamentoRespostas';
 
-  const searchFields: SearchType<Atividade>[] = [
-    { key: campoCurso, value: idCurso },
-  ];
+  const searchFields: SearchType<Atividade>[] = [];
 
-  if (situacao === SituacaoAtividadeLeitura.aberta) {
-    searchFields.push({ key: campoFechamento, value: { $gt: new Date() } });
-  } else if (situacao === SituacaoAtividadeLeitura.fechada) {
-    searchFields.push({ key: campoFechamento, value: { $lt: new Date() } });
+  if (situacao !== undefined) {
+    if (situacao === SituacaoAtividadeLeitura.aberta) {
+      searchFields.push({ key: campoFechamento, value: { $gt: new Date() } });
+    } else if (situacao === SituacaoAtividadeLeitura.fechada) {
+      searchFields.push({ key: campoFechamento, value: { $lt: new Date() } });
+    }
   }
 
   return Database.readDatas<Atividade, Atividade>(
@@ -177,23 +181,23 @@ const lerAtividadesCurso = async (
   );
 };
 
-const lerAtividadesMateria = (
-  idMateria: string,
-  situacao: SituacaoAtividadeLeitura = SituacaoAtividadeLeitura.aberta,
+const lerAtividadesEspecificas = async (
+  key: keyof Atividade,
+  value: any,
+  situacao: SituacaoAtividadeLeitura | undefined,
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<Atividade[]>> => {
-  const campoMateria: keyof Atividade = 'idMateria';
-  const campoFechamento = 'fechamentoRespostas';
+  const campoFechamento: keyof Atividade = 'fechamentoRespostas';
 
-  const searchFields: SearchType<Atividade>[] = [
-    { key: campoMateria, value: idMateria },
-  ];
+  const searchFields: SearchType<Atividade>[] = [{ key: key, value: value }];
 
-  if (situacao === SituacaoAtividadeLeitura.aberta) {
-    searchFields.push({ key: campoFechamento, value: { $gt: new Date() } });
-  } else if (situacao === SituacaoAtividadeLeitura.fechada) {
-    searchFields.push({ key: campoFechamento, value: { $lt: new Date() } });
+  if (situacao !== undefined) {
+    if (situacao === SituacaoAtividadeLeitura.aberta) {
+      searchFields.push({ key: campoFechamento, value: { $gt: new Date() } });
+    } else if (situacao === SituacaoAtividadeLeitura.fechada) {
+      searchFields.push({ key: campoFechamento, value: { $lt: new Date() } });
+    }
   }
 
   return Database.readDatas<Atividade, Atividade>(
@@ -204,27 +208,16 @@ const lerAtividadesMateria = (
   );
 };
 
-const lerAtividadesBancoDeQuestoes = (
-  situacao: SituacaoAtividadeLeitura = SituacaoAtividadeLeitura.aberta,
+const removerAtividade = async (
+  id: string,
   db: Db,
   session: ClientSession
-): Promise<DatabaseResult<Atividade[]>> => {
-  const campoTipo: keyof Atividade = 'tipoAtividade';
-  const campoFechamento = 'fechamentoRespostas';
+): Promise<DatabaseResult<null>> => {
+  const campoId: keyof Atividade = 'id';
 
-  const searchFields: SearchType<Atividade>[] = [
-    { key: campoTipo, value: TipoAtividade.BancoDeQuestoes },
-  ];
-
-  if (situacao === SituacaoAtividadeLeitura.aberta) {
-    searchFields.push({ key: campoFechamento, value: { $gt: new Date() } });
-  } else if (situacao === SituacaoAtividadeLeitura.fechada) {
-    searchFields.push({ key: campoFechamento, value: { $lt: new Date() } });
-  }
-
-  return Database.readDatas<Atividade, Atividade>(
+  return Database.remove<Atividade>(
     collection,
-    searchFields,
+    [{ key: campoId, value: id }],
     db,
     session
   );
@@ -235,7 +228,7 @@ export default {
   addAtividadeDissertativa,
   addAtividadeBancoDeQuestoes,
   lerAtividade,
-  lerAtividadesCurso,
-  lerAtividadesMateria,
-  lerAtividadesBancoDeQuestoes,
+  lerAtividades,
+  lerAtividadesEspecificas,
+  removerAtividade,
 };

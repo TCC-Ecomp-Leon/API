@@ -7,6 +7,7 @@ export type BancoDeQuestoes = {
    * Informação que será preenchida pela API.
    */
   criadoEm: Date;
+  idProjeto: string;
   /**
    * Identificador do curso ao qual a atividade está atrelada.
    * Necessário validar se o curso é válido.
@@ -23,4 +24,5 @@ export type BancoDeQuestoes = {
    * Questão em si.
    */
   questao: QuestaoBancoDeQuestoes;
+  assuntos: string[];
 };

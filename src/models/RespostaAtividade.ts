@@ -6,7 +6,7 @@ export enum EstadoRevisao {
   Finalizada = 3,
 }
 
-type InformacoesRespostaAtividade = {
+export type InformacoesRespostaAtividade = {
   /**
    * Identificador da resposta da atividade.
    */
@@ -20,6 +20,9 @@ type InformacoesRespostaAtividade = {
    * Quando foi respondida.
    */
   respondidoEm: Date;
+  idProjeto: string;
+  idCurso: string | null;
+  idMateria: string | null;
 };
 
 /**
@@ -72,6 +75,9 @@ export type CorrecaoDissertativa = {
    */
   status: StatusRespostaDissertativa;
   comentarios: string;
+  idProjeto: string;
+  idCurso: string | null;
+  idMateria: string | null;
 };
 
 /**
@@ -80,7 +86,7 @@ export type CorrecaoDissertativa = {
 export type QuestaoBancoDeQuestoes = {
   idAtividade: string;
   idQuestao: string;
-  enunciado: number;
+  enunciado: string;
   alternativas: { item: string; value: boolean }[];
 };
 

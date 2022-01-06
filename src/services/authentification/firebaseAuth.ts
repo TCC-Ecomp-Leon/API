@@ -23,6 +23,7 @@ export const checkLoginToken = async (
   DatabaseResult<{
     userId: string;
     email: string;
+    verifiedEmail: boolean;
   }>
 > => {
   if (
