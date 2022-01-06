@@ -105,6 +105,7 @@ const atualizarCurso = async (
 
 const atrelarColaboracao = (
   emailUniversitario: string,
+  idResposta: string,
   idAtividade: string,
   horasConfiguradas: number,
   db: Db,
@@ -117,6 +118,7 @@ const atrelarColaboracao = (
     'atividadesQueColaborou';
 
   let colaboracao: ColaboracaoAtividade = {
+    idResposta: idResposta,
     idAtividade: idAtividade,
     horas: horasConfiguradas,
     aprovado: false,
@@ -141,16 +143,16 @@ const atrelarColaboracao = (
 };
 
 const aprovarAtividades = (
-  idAtividades: string[],
+  idRespostas: string[],
   db: Db,
   session: ClientSession
 ) => {
-  const campoPesquisaAtividades: keyof ColaboracaoAtividade = 'idAtividade';
+  const campoPesquisaAtividades: keyof ColaboracaoAtividade = 'idResposta';
   const campoAprovar = 'atividadesQueColaborou.$[].aprovado';
 
   return Database.updateGenericDatas(
     collection,
-    [{ key: campoPesquisaAtividades, value: { $in: idAtividades } }],
+    [{ key: campoPesquisaAtividades, value: { $in: idRespostas } }],
     [{ key: campoAprovar, value: true }],
     db,
     session
@@ -158,16 +160,16 @@ const aprovarAtividades = (
 };
 
 const registrarEmissaoHoras = (
-  idAtividades: string[],
+  idRespostas: string[],
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<null>> => {
-  const campoPesquisaAtividades: keyof ColaboracaoAtividade = 'idAtividade';
+  const campoPesquisaAtividades: keyof ColaboracaoAtividade = 'idResposta';
   const campoEmissao = 'atividadesQueColaborou.$[].horasEmitidas';
 
   return Database.updateGenericDatas(
     collection,
-    [{ key: campoPesquisaAtividades, value: { $in: idAtividades } }],
+    [{ key: campoPesquisaAtividades, value: { $in: idRespostas } }],
     [{ key: campoEmissao, value: true }],
     db,
     session

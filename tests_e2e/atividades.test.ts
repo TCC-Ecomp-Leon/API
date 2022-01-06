@@ -11,6 +11,7 @@ import {
   BancoDeQuestoes,
   CodigoDeEntrada,
   Perfil,
+  RegraPerfil,
   RespostaAlternativa,
   RespostaAtividade,
   RespostaDissertativa,
@@ -504,7 +505,7 @@ test('Responder uma atividade banco de questões', async () => {
 
   const result = await request(app)
     .post(respostaEndpoint + '/' + atividadeBancoRegistrada.id)
-    .set(`Authorization`, `Bearer ${alunoAuthToken}`)
+    .set(`Authorization`, `Bearer ${universitarioAuthToken}`)
     .send(informacoes);
 
   expect(result.statusCode).toStrictEqual(200);
@@ -512,7 +513,7 @@ test('Responder uma atividade banco de questões', async () => {
 
   const obterResposta = await request(app)
     .get(respostaEndpoint + '/' + idResposta)
-    .set(`Authorization`, `Bearer ${alunoAuthToken}`);
+    .set(`Authorization`, `Bearer ${universitarioAuthToken}`);
   expect(obterResposta.statusCode).toStrictEqual(200);
 
   const resposta = obterResposta.body['resposta'] as RespostaAtividade;
@@ -520,6 +521,30 @@ test('Responder uma atividade banco de questões', async () => {
 
   expect(resposta.avaliada).toStrictEqual(false);
   respostaAtividadeBancoDeQuestoes = resposta;
+
+  const novoLoginUniversitario = await signIn(
+    emailUniversitario,
+    senhaUniversitario
+  );
+  const perfilUniversitarioPosCorrecao = novoLoginUniversitario.perfil;
+  universitarioAuthToken = novoLoginUniversitario.authToken;
+  if (perfilUniversitarioPosCorrecao.regra !== RegraPerfil.Geral)
+    throw Error('');
+  if (!perfilUniversitarioPosCorrecao.universitario.universitario)
+    throw Error('');
+  expect(
+    perfilUniversitarioPosCorrecao.universitario.atividadesQueColaborou.length
+  ).toStrictEqual(1);
+  const colaboracaoRegistrada =
+    perfilUniversitarioPosCorrecao.universitario.atividadesQueColaborou.find(
+      (colaboracao) =>
+        colaboracao.idResposta === respostaAtividadeBancoDeQuestoes.id
+    );
+  if (colaboracaoRegistrada === undefined) throw Error('');
+  expect(colaboracaoRegistrada.aprovado).toStrictEqual(false);
+  expect(colaboracaoRegistrada.horas).toStrictEqual(
+    atividadeBancoRegistrada.tempoColaboracao
+  );
 });
 
 test('Simulação de uma atividade alternativa já fechada para visualizar a nota', async () => {
@@ -585,6 +610,30 @@ test('Correção resposta dissertaviva', async () => {
   expect(resposta.corrigida).toStrictEqual(true);
   if (!resposta.corrigida) throw Error('');
   expect(resposta.nota).toStrictEqual(8);
+
+  const novoLoginUniversitario = await signIn(
+    emailUniversitario,
+    senhaUniversitario
+  );
+  const perfilUniversitarioPosCorrecao = novoLoginUniversitario.perfil;
+  universitarioAuthToken = novoLoginUniversitario.authToken;
+  if (perfilUniversitarioPosCorrecao.regra !== RegraPerfil.Geral)
+    throw Error('');
+  if (!perfilUniversitarioPosCorrecao.universitario.universitario)
+    throw Error('');
+  expect(
+    perfilUniversitarioPosCorrecao.universitario.atividadesQueColaborou.length
+  ).toStrictEqual(2);
+  const colaboracaoRegistrada =
+    perfilUniversitarioPosCorrecao.universitario.atividadesQueColaborou.find(
+      (colaboracao) =>
+        colaboracao.idResposta === respostaAtividadeDissertativa.id
+    );
+  if (colaboracaoRegistrada === undefined) throw Error('');
+  expect(colaboracaoRegistrada.aprovado).toStrictEqual(true);
+  expect(colaboracaoRegistrada.horas).toStrictEqual(
+    atividadeDissertativaRegistrada.tempoColaboracao
+  );
 });
 
 test('Aprovação de resposta do banco de questões', async () => {

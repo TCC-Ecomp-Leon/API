@@ -19,6 +19,7 @@ import Database from '../../services/data/Database';
 import RepositorioAtividade from '../../services/repositories/RepositorioAtividade';
 import RepositorioProjeto from '../../services/repositories/RepositorioProjeto';
 import RepositorioResposta from '../../services/repositories/RepositorioResposta';
+import RepositorioUniveristario from '../../services/repositories/RepositorioUniversitario';
 import Handler from '../../structure/handler';
 import {
   getCurrentProfile,
@@ -195,6 +196,25 @@ export const interagirRespostaHandler = new Handler(
             );
           if (!result.success) {
             throw result.error;
+          }
+
+          if (
+            userProfile.regra === RegraPerfil.Geral &&
+            userProfile.universitario.universitario
+          ) {
+            const atrelarAtividadeUniversitario =
+              await RepositorioUniveristario.atrelarColaboracao(
+                userProfile.email,
+                idResposta,
+                castAtividade.id,
+                castAtividade.tempoColaboracao,
+                db,
+                session,
+                true
+              );
+            if (!atrelarAtividadeUniversitario.success) {
+              throw atrelarAtividadeUniversitario.error;
+            }
           }
 
           return {
@@ -407,6 +427,15 @@ export const interagirRespostaHandler = new Handler(
         if (!result.success) {
           throw result.error;
         }
+
+        const aprovacaoQuestoesBancoDeQuestoes =
+          await RepositorioUniveristario.aprovarAtividades(
+            [idResposta],
+            db,
+            session
+          );
+        if (!aprovacaoQuestoesBancoDeQuestoes.success)
+          throw aprovacaoQuestoesBancoDeQuestoes.error;
 
         return {
           status: 200,

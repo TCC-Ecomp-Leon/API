@@ -2,7 +2,7 @@ import {
   DatabaseService,
   withDatabaseTransaction,
 } from '../../config/database';
-import { Perfil, RegraPerfil, TipoAtividade } from '../../models';
+import { Atividade, Perfil, RegraPerfil, TipoAtividade } from '../../models';
 import { InformacoesAtividadeValidator } from '../../schemas/atividade';
 import {
   InformacoesResposta,
@@ -17,6 +17,7 @@ import {
   NavigationResult,
 } from '../../structure/navigation';
 import { v4 as uuid } from 'uuid';
+import RepositorioUniversitario from '../../services/repositories/RepositorioUniversitario';
 
 export const responderAtividadeHandler = new Handler(
   async (context): Promise<NavigationResult<{ idResposta: string }>> => {
@@ -109,6 +110,17 @@ export const responderAtividadeHandler = new Handler(
             session
           );
         } else if (informacoesResposta.tipo === TipoAtividade.BancoDeQuestoes) {
+          if (
+            userProfile.regra === RegraPerfil.Geral &&
+            userProfile.universitario.universitario === false
+          ) {
+            return {
+              status: 403,
+              body: {
+                error: 'NOT_AUTHORIZED',
+              },
+            };
+          }
           result = await RepositorioResposta.responderAtividadeBancoDeQuestoes(
             atividade.idProjeto,
             atividade.idCurso,
@@ -123,6 +135,20 @@ export const responderAtividadeHandler = new Handler(
             db,
             session
           );
+
+          const castAtividade = atividade as Atividade & {
+            tipoAtividade: TipoAtividade.BancoDeQuestoes;
+          };
+          if (!result.success) throw result.error;
+          const result2 = await RepositorioUniversitario.atrelarColaboracao(
+            userProfile.email,
+            result.data,
+            idAtividade,
+            castAtividade.tempoColaboracao,
+            db,
+            session
+          );
+          if (!result2.success) throw result2.error;
         } else {
           throw Error('Resposta de atividade com tipo inválido');
         }
