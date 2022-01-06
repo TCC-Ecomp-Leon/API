@@ -83,6 +83,7 @@ const checkLoginToken = async (
   DatabaseResult<{
     userId: string;
     email: string;
+    verifiedEmail: boolean;
   }>
 > => {
   const { auth, adminAuth } = getFirebaseReference();
@@ -95,6 +96,7 @@ const checkLoginToken = async (
       data: {
         userId: authUser.uid,
         email: verifyTokenResult.email,
+        verifiedEmail: authUser.emailVerified,
       },
     };
   } catch (e) {

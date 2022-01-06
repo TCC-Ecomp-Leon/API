@@ -13,6 +13,7 @@ export const authHandler = <T>(
   getProfile: (
     userId: string,
     email: string,
+    verifiedEmail: boolean,
     session: ClientSession,
     db: Db
   ) => Promise<DatabaseResult<T | null>>,
@@ -44,6 +45,7 @@ export const authHandler = <T>(
       const profileResult = await getProfile(
         authResult.data.userId,
         authResult.data.email,
+        authResult.data.verifiedEmail,
         session,
         db
       );

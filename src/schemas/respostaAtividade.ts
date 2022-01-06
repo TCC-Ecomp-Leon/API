@@ -24,7 +24,7 @@ export type InformacoesRespostaDissertativa = {
 };
 export type InformacoesRespostaBancoDeQuestoes = {
   tipo: TipoAtividade.BancoDeQuestoes;
-  respostas: Omit<QuestaoBancoDeQuestoes, 'idAtividade'>[];
+  respostas: Omit<QuestaoBancoDeQuestoes, 'idAtividade' | 'idQuestao'>[];
 };
 
 const _informacoesRespostaAlternativa: JSONSchemaType<InformacoesRespostaAlternativa> =
@@ -108,7 +108,6 @@ const _informacoesRespostaBancoDeQuestoes: JSONSchemaType<InformacoesRespostaBan
         items: {
           type: 'object',
           properties: {
-            idQuestao: { type: 'string' },
             enunciado: { type: 'string' },
             alternativas: {
               type: 'array',
@@ -122,7 +121,7 @@ const _informacoesRespostaBancoDeQuestoes: JSONSchemaType<InformacoesRespostaBan
               },
             },
           },
-          required: ['idQuestao', 'enunciado', 'alternativas'],
+          required: ['enunciado', 'alternativas'],
         },
       },
     },

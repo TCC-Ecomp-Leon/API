@@ -16,9 +16,10 @@ import {
   getCurrentProfile,
   NavigationResult,
 } from '../../structure/navigation';
+import { v4 as uuid } from 'uuid';
 
 export const responderAtividadeHandler = new Handler(
-  async (context): Promise<NavigationResult<null>> => {
+  async (context): Promise<NavigationResult<{ idResposta: string }>> => {
     const userProfile = getCurrentProfile<Perfil>(context);
     const idAtividade = context.params['idAtividade'] as string;
 
@@ -48,94 +49,95 @@ export const responderAtividadeHandler = new Handler(
 
     const informacoesResposta = body as InformacoesResposta;
 
-    const service: DatabaseService<NavigationResult<null>> = async (
-      db,
-      session
-    ) => {
-      const leituraAtividade = await RepositorioAtividade.lerAtividade(
-        idAtividade,
-        db,
-        session
-      );
-      if (!leituraAtividade.success) {
-        return {
-          status: 404,
-          body: {
-            error: 'DATA_NOT_FOUND',
-          },
-        };
-      }
-      const atividade = leituraAtividade.data;
-
-      if (!userProfile.universitario.universitario) {
-        if (!userProfile.associacoes.aluno.alunoParceiro) {
-          throw Error('Condicionais erradas');
-        }
-        const cursosAluno = userProfile.associacoes.aluno.cursos;
-        if (
-          cursosAluno.find((curso) => curso.id === atividade.idCurso) ==
-          undefined
-        ) {
+    const service: DatabaseService<NavigationResult<{ idResposta: string }>> =
+      async (db, session) => {
+        const leituraAtividade = await RepositorioAtividade.lerAtividade(
+          idAtividade,
+          db,
+          session
+        );
+        if (!leituraAtividade.success) {
           return {
-            status: 403,
+            status: 404,
             body: {
-              error: 'NOT_AUTHORIZED',
+              error: 'DATA_NOT_FOUND',
             },
           };
         }
-      }
+        const atividade = leituraAtividade.data;
 
-      let result: DatabaseResult<string>;
+        if (!userProfile.universitario.universitario) {
+          if (!userProfile.associacoes.aluno.alunoParceiro) {
+            throw Error('Condicionais erradas');
+          }
+          const cursosAluno = userProfile.associacoes.aluno.cursos;
+          if (
+            cursosAluno.find((curso) => curso.id === atividade.idCurso) ==
+            undefined
+          ) {
+            return {
+              status: 403,
+              body: {
+                error: 'NOT_AUTHORIZED',
+              },
+            };
+          }
+        }
 
-      if (informacoesResposta.tipo === TipoAtividade.Alternativa) {
-        result = await RepositorioResposta.responderAtividadeAlternativa(
-          atividade.idProjeto,
-          atividade.idCurso,
-          atividade.idMateria,
-          idAtividade,
-          userProfile.id,
-          informacoesResposta.respostas,
-          db,
-          session
-        );
-      } else if (informacoesResposta.tipo === TipoAtividade.Dissertativa) {
-        result = await RepositorioResposta.responderAtividadeDissertativa(
-          atividade.idProjeto,
-          atividade.idCurso,
-          atividade.idMateria,
-          idAtividade,
-          userProfile.id,
-          informacoesResposta.respostas,
-          db,
-          session
-        );
-      } else if (informacoesResposta.tipo === TipoAtividade.BancoDeQuestoes) {
-        result = await RepositorioResposta.responderAtividadeBancoDeQuestoes(
-          atividade.idProjeto,
-          atividade.idCurso,
-          atividade.idMateria,
-          idAtividade,
-          userProfile.id,
-          informacoesResposta.respostas.map((info) => ({
-            ...info,
-            idAtividade: idAtividade,
-          })),
-          db,
-          session
-        );
-      } else {
-        throw Error('Resposta de atividade com tipo inválido');
-      }
+        let result: DatabaseResult<string>;
 
-      if (!result.success) {
-        throw result.error;
-      }
+        if (informacoesResposta.tipo === TipoAtividade.Alternativa) {
+          result = await RepositorioResposta.responderAtividadeAlternativa(
+            atividade.idProjeto,
+            atividade.idCurso,
+            atividade.idMateria,
+            idAtividade,
+            userProfile.id,
+            informacoesResposta.respostas,
+            db,
+            session
+          );
+        } else if (informacoesResposta.tipo === TipoAtividade.Dissertativa) {
+          result = await RepositorioResposta.responderAtividadeDissertativa(
+            atividade.idProjeto,
+            atividade.idCurso,
+            atividade.idMateria,
+            idAtividade,
+            userProfile.id,
+            informacoesResposta.respostas,
+            db,
+            session
+          );
+        } else if (informacoesResposta.tipo === TipoAtividade.BancoDeQuestoes) {
+          result = await RepositorioResposta.responderAtividadeBancoDeQuestoes(
+            atividade.idProjeto,
+            atividade.idCurso,
+            atividade.idMateria,
+            idAtividade,
+            userProfile.id,
+            informacoesResposta.respostas.map((info) => ({
+              ...info,
+              idAtividade: idAtividade,
+              idQuestao: uuid(),
+            })),
+            db,
+            session
+          );
+        } else {
+          throw Error('Resposta de atividade com tipo inválido');
+        }
 
-      return {
-        status: 200,
-        body: null,
+        if (!result.success) {
+          throw result.error;
+        }
+
+        return {
+          status: 200,
+          body: {
+            idResposta: result.data,
+          },
+        };
       };
-    };
 
     return await withDatabaseTransaction(service);
   }

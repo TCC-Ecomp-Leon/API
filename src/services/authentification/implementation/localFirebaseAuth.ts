@@ -106,6 +106,7 @@ const checkLoginToken = async (
   DatabaseResult<{
     userId: string;
     email: string;
+    verifiedEmail: boolean;
   }>
 > => {
   try {
@@ -125,6 +126,7 @@ const checkLoginToken = async (
       data: {
         userId: user.userId,
         email: user.email,
+        verifiedEmail: true,
       },
     };
   } catch (e) {

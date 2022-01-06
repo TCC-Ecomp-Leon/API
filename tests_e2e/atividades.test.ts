@@ -2,13 +2,32 @@ import { addDays, subDays } from 'date-fns';
 import request from 'supertest';
 import app from '../src/app';
 import {
+  DatabaseService,
+  withDatabaseTransaction,
+} from '../src/config/database';
+import {
   Atividade,
+  AvaliacaoRespostaBancoDeQuestoes,
+  BancoDeQuestoes,
   CodigoDeEntrada,
   Perfil,
+  RespostaAlternativa,
+  RespostaAtividade,
+  RespostaDissertativa,
+  StatusRespostaDissertativa,
   TipoAtividade,
   TipoCodigoDeEntrada,
 } from '../src/models';
 import { InformacoesAtividade } from '../src/schemas/atividade';
+import {
+  InformacoesCorrecaoQuestoesDissertativas,
+  InformacoesRespostaAlternativa,
+  InformacoesRespostaBancoDeQuestoes,
+  InformacoesRespostaDissertativa,
+} from '../src/schemas/respostaAtividade';
+import Database from '../src/services/data/Database';
+
+jest.setTimeout(100000);
 
 let projetoAuthToken: string;
 let alunoAuthToken: string;
@@ -26,6 +45,8 @@ const senhaUniversitario = 'universitario2@unifesp';
 const authEndpoint = '/auth/sign/';
 const codigoDeEntradaEndpoint = '/codigo-de-entrada';
 const atividadeEndpoint = '/atividade';
+const respostaEndpoint = '/resposta-atividade';
+const bancoDeQuestoesEndpoint = '/banco-questoes';
 
 const idProjeto = '71bcad70-6fb5-4de4-bd45-02a2b8cb7864';
 const idCurso = 'f8328156-9106-4e84-a99d-eff3f09ed273';
@@ -43,7 +64,25 @@ const informacoesAluno: InformacoesRegistroPerfil = {
   cpf: 'YYYYYYYY',
 };
 
-const atividadesRegistradas: Atividade[] = [];
+let atividadeAlternativaRegistrada: Atividade & {
+  tipoAtividade: TipoAtividade.Alternativa;
+};
+let atividadeDissertativaRegistrada: Atividade & {
+  tipoAtividade: TipoAtividade.Dissertativa;
+};
+let atividadeBancoRegistrada: Atividade & {
+  tipoAtividade: TipoAtividade.BancoDeQuestoes;
+};
+
+let respostaAtividadeAlternativa: RespostaAtividade & {
+  tipo: TipoAtividade.Alternativa;
+};
+let respostaAtividadeDissertativa: RespostaAtividade & {
+  tipo: TipoAtividade.Dissertativa;
+};
+let respostaAtividadeBancoDeQuestoes: RespostaAtividade & {
+  tipo: TipoAtividade.BancoDeQuestoes;
+};
 
 beforeAll(async () => {
   projetoAuthToken = (await signIn(emailProjeto, senhaProjeto)).authToken;
@@ -135,7 +174,7 @@ test('Registro de uma atividade alternativa', async () => {
       idQuestao: undefined,
     })),
   });
-  atividadesRegistradas.push(atividadeRegistrada);
+  atividadeAlternativaRegistrada = atividadeRegistrada;
 
   const atividadesDepoisProjeto = await obterListaAtividades(
     projetoAuthToken,
@@ -235,7 +274,7 @@ test('Registro de uma atividade dissertativa', async () => {
       idQuestao: undefined,
     })),
   });
-  atividadesRegistradas.push(atividadeRegistrada);
+  atividadeDissertativaRegistrada = atividadeRegistrada;
 
   const atividadesDepoisProjeto = await obterListaAtividades(
     projetoAuthToken,
@@ -307,7 +346,7 @@ test('Registro de uma atividade de banco de questões', async () => {
     aberturaRespostas: new Date(informacoes.aberturaRespostas),
     fechamentoRespostas: new Date(informacoes.fechamentoRespostas),
   });
-  atividadesRegistradas.push(atividadeRegistrada);
+  atividadeBancoRegistrada = atividadeRegistrada;
 
   const atividadesDepoisProjeto = await obterListaAtividades(
     projetoAuthToken,
@@ -365,6 +404,253 @@ test('Listagem de atividades de um projeto e curso', async () => {
   expect(todasAtividades).toStrictEqual(atividadesCurso);
   expect(todasAtividades).toStrictEqual(todasAtividadesAbertas);
 });
+
+test('Responder uma atividade alternativa', async () => {
+  const informacoes: InformacoesRespostaAlternativa = {
+    tipo: TipoAtividade.Alternativa,
+    respostas: atividadeAlternativaRegistrada.itens.map(
+      (questao): RespostaAlternativa => {
+        return {
+          idQuestao: questao.idQuestao,
+          alternativas: questao.alternativas,
+        };
+      }
+    ),
+  };
+
+  const result = await request(app)
+    .post(respostaEndpoint + '/' + atividadeAlternativaRegistrada.id)
+    .set(`Authorization`, `Bearer ${alunoAuthToken}`)
+    .send(informacoes);
+
+  expect(result.statusCode).toStrictEqual(200);
+  const idResposta = result.body['idResposta'] as string;
+
+  const obterResposta = await request(app)
+    .get(respostaEndpoint + '/' + idResposta)
+    .set(`Authorization`, `Bearer ${alunoAuthToken}`);
+  expect(obterResposta.statusCode).toStrictEqual(200);
+
+  const resposta = obterResposta.body['resposta'] as RespostaAtividade;
+  if (resposta.tipo !== TipoAtividade.Alternativa) throw Error('');
+
+  expect(resposta.encerrada).toStrictEqual(false);
+  respostaAtividadeAlternativa = resposta;
+});
+
+test('Responder uma atividade dissertativa', async () => {
+  const informacoes: InformacoesRespostaDissertativa = {
+    tipo: TipoAtividade.Dissertativa,
+    respostas: atividadeDissertativaRegistrada.itens.map(
+      (questao): RespostaDissertativa => {
+        return {
+          idQuestao: questao.idQuestao,
+          resposta: {
+            foto: false,
+            texto: 'teste',
+          },
+        };
+      }
+    ),
+  };
+
+  const result = await request(app)
+    .post(respostaEndpoint + '/' + atividadeDissertativaRegistrada.id)
+    .set(`Authorization`, `Bearer ${alunoAuthToken}`)
+    .send(informacoes);
+
+  expect(result.statusCode).toStrictEqual(200);
+  const idResposta = result.body['idResposta'] as string;
+
+  const obterResposta = await request(app)
+    .get(respostaEndpoint + '/' + idResposta)
+    .set(`Authorization`, `Bearer ${alunoAuthToken}`);
+  expect(obterResposta.statusCode).toStrictEqual(200);
+
+  const resposta = obterResposta.body['resposta'] as RespostaAtividade;
+  if (resposta.tipo !== TipoAtividade.Dissertativa) throw Error('');
+
+  expect(resposta.corrigida).toStrictEqual(false);
+  respostaAtividadeDissertativa = resposta;
+});
+
+test('Responder uma atividade banco de questões', async () => {
+  const informacoes: InformacoesRespostaBancoDeQuestoes = {
+    tipo: TipoAtividade.BancoDeQuestoes,
+    respostas: [
+      {
+        enunciado: 'Teste inserção de item no banco de questões',
+        alternativas: [
+          {
+            item: 'a) alternativa a',
+            value: false,
+          },
+          {
+            item: 'b) alternativa b',
+            value: false,
+          },
+          {
+            item: 'c) alternativa c',
+            value: true,
+          },
+          {
+            item: 'd) alternativa d',
+            value: false,
+          },
+        ],
+      },
+    ],
+  };
+
+  const result = await request(app)
+    .post(respostaEndpoint + '/' + atividadeBancoRegistrada.id)
+    .set(`Authorization`, `Bearer ${alunoAuthToken}`)
+    .send(informacoes);
+
+  expect(result.statusCode).toStrictEqual(200);
+  const idResposta = result.body['idResposta'] as string;
+
+  const obterResposta = await request(app)
+    .get(respostaEndpoint + '/' + idResposta)
+    .set(`Authorization`, `Bearer ${alunoAuthToken}`);
+  expect(obterResposta.statusCode).toStrictEqual(200);
+
+  const resposta = obterResposta.body['resposta'] as RespostaAtividade;
+  if (resposta.tipo !== TipoAtividade.BancoDeQuestoes) throw Error('');
+
+  expect(resposta.avaliada).toStrictEqual(false);
+  respostaAtividadeBancoDeQuestoes = resposta;
+});
+
+test('Simulação de uma atividade alternativa já fechada para visualizar a nota', async () => {
+  const service: DatabaseService<void> = async (db, session) => {
+    const campoIdAtividade: keyof Atividade = 'id';
+    const dbResult = await Database.updatePartialData<
+      Atividade & { tipoAtividade: TipoAtividade.Alternativa }
+    >(
+      'Atividade',
+      [{ key: campoIdAtividade, value: atividadeAlternativaRegistrada.id }],
+      { fechamentoRespostas: subDays(new Date(), 1) },
+      db,
+      session
+    );
+    if (!dbResult.success) {
+      throw Error('');
+    }
+  };
+  await withDatabaseTransaction(service);
+
+  const idResposta = respostaAtividadeAlternativa.id;
+
+  const obterResposta = await request(app)
+    .get(respostaEndpoint + '/' + idResposta)
+    .set(`Authorization`, `Bearer ${alunoAuthToken}`);
+  expect(obterResposta.statusCode).toStrictEqual(200);
+
+  const resposta = obterResposta.body['resposta'] as RespostaAtividade;
+  if (resposta.tipo !== TipoAtividade.Alternativa) throw Error('');
+
+  expect(resposta.encerrada).toStrictEqual(true);
+  if (!resposta.encerrada) throw Error('');
+  expect(resposta.nota).toStrictEqual(10);
+});
+
+test('Correção resposta dissertaviva', async () => {
+  const idResposta = respostaAtividadeDissertativa.id;
+
+  const informacoes: InformacoesCorrecaoQuestoesDissertativas =
+    respostaAtividadeDissertativa.respostas.map((resposta) => {
+      return {
+        idQuestao: resposta.idQuestao,
+        nota: 8,
+        status: StatusRespostaDissertativa.ParcialmenteCerto,
+        comentarios: 'teste',
+      };
+    });
+
+  const result = await request(app)
+    .put(respostaEndpoint + '/' + idResposta)
+    .set(`Authorization`, `Bearer ${universitarioAuthToken}`)
+    .send(informacoes);
+
+  expect(result.statusCode).toStrictEqual(200);
+
+  const obterResposta = await request(app)
+    .get(respostaEndpoint + '/' + idResposta)
+    .set(`Authorization`, `Bearer ${alunoAuthToken}`);
+  expect(obterResposta.statusCode).toStrictEqual(200);
+
+  const resposta = obterResposta.body['resposta'] as RespostaAtividade;
+  if (resposta.tipo !== TipoAtividade.Dissertativa) throw Error('');
+  expect(resposta.corrigida).toStrictEqual(true);
+  if (!resposta.corrigida) throw Error('');
+  expect(resposta.nota).toStrictEqual(8);
+});
+
+test('Aprovação de resposta do banco de questões', async () => {
+  const questoesProjetoAntes = await obterListaQuestoesBancoDeQuestoes(
+    projetoAuthToken,
+    idProjeto,
+    undefined,
+    undefined,
+    undefined
+  );
+
+  const idResposta = respostaAtividadeBancoDeQuestoes.id;
+  const informacoes: AvaliacaoRespostaBancoDeQuestoes = {
+    avaliacaoQuestoes: respostaAtividadeBancoDeQuestoes.respostas.map(
+      (resposta) => {
+        return {
+          idQuestao: resposta.idQuestao,
+          aprovada: true,
+        };
+      }
+    ),
+    comentario: 'Muito bom, estamos finalizando a API',
+  };
+
+  const result = await request(app)
+    .put(respostaEndpoint + '/' + idResposta)
+    .set(`Authorization`, `Bearer ${projetoAuthToken}`)
+    .send(informacoes);
+
+  expect(result.statusCode).toStrictEqual(200);
+
+  const questoesProjetoDepois = await obterListaQuestoesBancoDeQuestoes(
+    projetoAuthToken,
+    idProjeto,
+    undefined,
+    undefined,
+    undefined
+  );
+
+  expect(
+    questoesProjetoDepois.length - questoesProjetoAntes.length
+  ).toStrictEqual(respostaAtividadeBancoDeQuestoes.respostas.length);
+});
+
+const obterListaQuestoesBancoDeQuestoes = async (
+  authToken: string,
+  idProjeto: string,
+  idCurso: string | undefined,
+  idMateria: string | undefined,
+  assuntos: string[] | undefined
+): Promise<BancoDeQuestoes[]> => {
+  const responde = await request(app)
+    .get(bancoDeQuestoesEndpoint + '/' + idProjeto)
+    .set(`Authorization`, `Bearer ${authToken}`)
+    .query(idCurso !== undefined ? { curso: idCurso } : {})
+    .query(idMateria !== undefined ? { materia: idMateria } : {})
+    .query(assuntos !== undefined ? { assuntos: assuntos } : {});
+
+  expect(responde.statusCode).toStrictEqual(200);
+  if (responde.statusCode !== 200) {
+    throw Error('');
+  }
+
+  const questoes = responde.body['questoes'] as BancoDeQuestoes[];
+  return questoes;
+};
 
 const obterListaAtividades = async (
   authToken: string,

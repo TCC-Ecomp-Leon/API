@@ -20,25 +20,6 @@ const emailInstitucionalValido = (email: string): boolean => {
   return fields[1] === sufixoEmailInstitucional;
 };
 
-const gravarCamposUniversitarioPendentes = (
-  email: string,
-  db: Db,
-  session: ClientSession
-): Promise<DatabaseResult<null>> => {
-  const informacoes: InformacoesUniversitario = {
-    email: email,
-    universitario: true,
-    atividadesQueColaborou: [],
-  };
-
-  return Database.addData<InformacoesUniversitario>(
-    collection,
-    informacoes,
-    db,
-    session
-  );
-};
-
 const readInformacoesUniversitario = async (
   email: string,
   emailValidado: boolean,
@@ -64,11 +45,18 @@ const readInformacoesUniversitario = async (
         session
       );
     if (!informacoes.success) {
-      const gravarInformacoes = await gravarCamposUniversitarioPendentes(
-        email,
-        db,
-        session
-      );
+      const informacoesUniversitario: InformacoesUniversitarioAprovado = {
+        graduacao: undefined,
+        email: email,
+        atividadesQueColaborou: [],
+      };
+      const gravarInformacoes =
+        await Database.addData<InformacoesUniversitarioAprovado>(
+          collection,
+          informacoesUniversitario,
+          db,
+          session
+        );
       if (!gravarInformacoes.success) {
         throw gravarInformacoes.error;
       }
@@ -77,9 +65,7 @@ const readInformacoesUniversitario = async (
         success: true,
         data: {
           universitario: true,
-          graduacao: undefined,
-          email: email,
-          atividadesQueColaborou: [],
+          ...informacoesUniversitario,
         },
       };
     }
