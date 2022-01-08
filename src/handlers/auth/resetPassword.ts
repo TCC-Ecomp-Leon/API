@@ -6,8 +6,8 @@ import { NavigationResult } from '../../structure/navigation';
 
 export const resetPasswordHandler = new Handler(
   async (context: Context): Promise<NavigationResult<null>> => {
-    const userProfile = context.getVariable<Perfil>('profile');
-    const request = await requestResetPassword(userProfile.email);
+    const email = context.params['email'] as string;
+    const request = await requestResetPassword(email);
 
     if (!request.success) {
       throw request.error;

@@ -8,7 +8,7 @@ const authController = new AuthController();
 router.put('/auth/sign', authController.signIn.bind(authController));
 router.post('/auth/sign', authController.signUp.bind(authController));
 router.post(
-  '/auth/reset-password',
+  '/auth/reset-password/:email',
   authController.resetPassword.bind(authController)
 );
 router.put(
