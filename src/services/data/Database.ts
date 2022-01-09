@@ -201,7 +201,7 @@ const readData = async <T>(
 
     return {
       success: true,
-      data: response[0] as T,
+      data: response[0] as any as T,
     };
   } catch (e) {
     return {
@@ -260,7 +260,7 @@ const readCollection = async <T>(
 
     return {
       success: true,
-      data: response.map((data) => data as T),
+      data: response.map((data) => data as any as T),
     };
   } catch (e) {
     return {
