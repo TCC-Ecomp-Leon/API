@@ -4,6 +4,7 @@ import { backtrackObject, delay } from './utils';
 import environmentVariables from '../src/config/environmentVariables';
 import { InformacoesProjeto, Projeto } from '../src/models';
 import { v1 as uuid } from 'uuid';
+import assets from '../src/assets/images';
 
 jest.setTimeout(100000);
 
@@ -39,6 +40,7 @@ test('Registro de projeto', async () => {
     descricao: 'TESTE',
     email: uuid() + '@test.com',
     telefone: 0,
+    imgProjeto: assets.imgProjeto,
     endereco: {
       rua: 'R. TESTE TESTANDO',
       numero: 0,
@@ -174,6 +176,7 @@ test('Atualização de projeto', async () => {
     nome: 'ATUALIZAÇÃO PROJETO',
     descricao: 'ATUALIZANDO PROJETO',
     telefone: 1,
+    imgProjeto: assets.imgProjeto,
     endereco: {
       rua: 'R. ATUALIZADA',
       numero: 0,
@@ -203,6 +206,7 @@ test('Atualização de projeto', async () => {
     descricao: projeto.descricao,
     telefone: projeto.telefone,
     endereco: projeto.endereco,
+    imgProjeto: projeto.imgProjeto,
   };
 
   const opcoesParciais = backtrackObject(camposOpcionais, true, true);
@@ -237,6 +241,7 @@ test('Atualização de projeto', async () => {
       descricao: projetoAposAtualizacao.descricao,
       telefone: projetoAposAtualizacao.telefone,
       endereco: projetoAposAtualizacao.endereco,
+      imgProjeto: projeto.imgProjeto,
     };
 
     expect(informacoesAtualizadas).toStrictEqual(atualizacao);
