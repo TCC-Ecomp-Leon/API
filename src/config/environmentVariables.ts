@@ -85,45 +85,6 @@ export default function (): EnvirontmentVariables {
   return envVariables as EnvirontmentVariables;
 }
 
-/**
- * Function to select what environment we will, the local, beta or prod env.
- */
 function initEnv(): void {
-  const options = {
-    local: process.env.ENV === undefined || process.env.ENV === 'LOCAL',
-    test: process.env.ENV === 'TEST',
-    beta: process.env.ENV === 'BETA',
-    prod: process.env.ENV === 'PROD',
-  };
-
-  if (options.prod) {
-    /**
-     * The production environment using the production firebase
-     * configuration and the production mongodb database
-     */
-    dotenv.config({ path: '.env.prod' });
-
-    process.env.ENV = 'PROD';
-  } else if (options.beta) {
-    /**
-     * The beta environment using the beta firebase configuration
-     * and the beta mongodb database
-     */
-    dotenv.config({ path: '.env.beta' });
-    process.env.ENV = 'BETA';
-  } else if (options.test) {
-    /**
-     * The local environment using the local firebase emulation and
-     * the local mongodb database for test
-     */
-    dotenv.config({ path: '.env.test' });
-    process.env.ENV = 'TEST';
-  } else {
-    /**
-     * The local environment using the local firebase emulation and
-     * the local mongodb database
-     */
-    dotenv.config({ path: '.env' });
-    process.env.ENV = 'LOCAL';
-  }
+  dotenv.config({ path: '.env' });
 }
