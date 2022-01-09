@@ -170,6 +170,7 @@ const adicionarProjeto = async (
   descricao: string,
   email: string,
   telefone: number,
+  imgProjeto: string,
   endereco: Endereco,
   db: Db,
   session: ClientSession
@@ -183,6 +184,7 @@ const adicionarProjeto = async (
     requisicaoEntradaEm: new Date(),
     endereco: endereco,
     aprovado: false,
+    imgProjeto: imgProjeto,
   };
 
   const result = await Database.addData<Projeto>(

@@ -3,7 +3,10 @@ import {
   withDatabaseTransaction,
 } from '../../config/database';
 import { Perfil, RegraPerfil } from '../../models';
-import { AtualizarProjetoValidator } from '../../schemas/projeto';
+import {
+  AtualizarProjetoValidator,
+  InformacoesAtualizacaoProjeto,
+} from '../../schemas/projeto';
 import RepositorioProjeto from '../../services/repositories/RepositorioProjeto';
 import Handler from '../../structure/handler';
 import {
@@ -34,6 +37,8 @@ export const atualizarProjetoHandler = new Handler(
         },
       };
     }
+
+    const informacoes = body as InformacoesAtualizacaoProjeto;
 
     const service: DatabaseService<NavigationResult<null>> = async (
       db,
@@ -68,7 +73,7 @@ export const atualizarProjetoHandler = new Handler(
 
       const atualizacaoProjeto = await RepositorioProjeto.atualizarProjeto(
         idProjeto,
-        body,
+        informacoes,
         db,
         session
       );

@@ -3,7 +3,10 @@ import {
   withDatabaseTransaction,
 } from '../../config/database';
 import { Endereco } from '../../models';
-import { RegistroProjetoValidator } from '../../schemas/projeto';
+import {
+  InformacoesRegistroProjeto,
+  RegistroProjetoValidator,
+} from '../../schemas/projeto';
 import RepositorioProjeto from '../../services/repositories/RepositorioProjeto';
 import Context from '../../structure/context';
 import Handler from '../../structure/handler';
@@ -26,13 +29,7 @@ export const registrarProjetoHandler = new Handler(
       db,
       session
     ) => {
-      const informacoes = body as {
-        nome: string;
-        descricao: string;
-        email: string;
-        telefone: number;
-        endereco: Endereco;
-      };
+      const informacoes = body as InformacoesRegistroProjeto;
 
       const consultaExistenciaProjeto =
         await RepositorioProjeto.readProjetoPorEmail(
@@ -54,6 +51,7 @@ export const registrarProjetoHandler = new Handler(
         informacoes.descricao,
         informacoes.email,
         informacoes.telefone,
+        informacoes.imgProjeto,
         informacoes.endereco,
         db,
         session

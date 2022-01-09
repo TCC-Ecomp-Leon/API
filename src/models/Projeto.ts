@@ -15,6 +15,7 @@ export type InformacoesProjeto = {
    */
   requisicaoEntradaEm: Date;
   endereco: Endereco;
+  imgProjeto: string;
 };
 
 /**
