@@ -93,6 +93,7 @@ const mockProjetos: {
       email: emailProjeto,
       telefone: 12000000000,
       requisicaoEntradaEm: new Date(),
+      imgProjeto: assets.imgProjeto,
       endereco: {
         rua: 'R. TESTE TESTANDO',
         numero: 0,
@@ -138,6 +139,7 @@ const mockProjetos: {
       email: emailProjeto2,
       telefone: 12000000000,
       requisicaoEntradaEm: new Date(),
+      imgProjeto: assets.imgProjeto,
       endereco: {
         rua: 'R. TESTE TESTANDO 2',
         numero: 2,
@@ -184,6 +186,7 @@ const mockProjetos: {
       email: emailProjeto3,
       telefone: 12000000000,
       requisicaoEntradaEm: new Date(),
+      imgProjeto: assets.imgProjeto,
       endereco: {
         rua: 'R. TESTE TESTANDO 3',
         numero: 2,
