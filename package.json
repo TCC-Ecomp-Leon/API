@@ -4,10 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "prestart": "ts-node src/env.ts",
-    "start": "ts-node src/index.ts",
-    "pretest": "ENV='TEST' ts-node src/env.ts ; ts-node-dev tests_e2e/test_data.ts ; ts-node src/mocks/index.ts",
-    "test": "jest --maxWorkers=1"
+    "start": "ts-node-dev src/index.ts",
+    "pretest": "ENV='TEST' ts-node-dev tests_e2e/test_data.ts ; ENV='TEST' ts-node src/mocks/index.ts",
+    "test": "ENV='TEST' jest --maxWorkers=1"
   },
   "jest": {
     "preset": "ts-jest",
