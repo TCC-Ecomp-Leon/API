@@ -12,6 +12,7 @@ import Context from '../../structure/context';
 import Handler from '../../structure/handler';
 import { NavigationResult } from '../../structure/navigation';
 import generator from 'generate-password';
+import RepositorioPerfil from '../../services/repositories/RepositorioPerfil';
 
 export const aprovarProjetoHandler = new Handler(
   async (context: Context): Promise<NavigationResult<null>> => {
@@ -61,16 +62,16 @@ export const aprovarProjetoHandler = new Handler(
         };
       }
 
-      const alteracoesBanco = await RepositorioProjeto.aprovarProjeto(
-        projeto.email,
+      const resultAprovarProjeto = await RepositorioPerfil.addPerfilProjeto(
         registerResult.data.userId,
+        projeto.email,
         db,
         session
       );
 
-      if (!alteracoesBanco.success) {
+      if (!resultAprovarProjeto.success) {
         await deleteAccount(registerResult.data.token);
-        throw alteracoesBanco.error;
+        throw resultAprovarProjeto.error;
       }
 
       // TODO: Enviar um email com essa senha gerada
