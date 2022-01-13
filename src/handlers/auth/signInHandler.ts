@@ -23,7 +23,7 @@ export const signInHandler = <T>(
   return new Handler(
     async (
       context: Context
-    ): Promise<NavigationResult<{ authToken: string; profile: T }>> => {
+    ): Promise<NavigationResult<{ authToken: string } & T>> => {
       if (!LoginValidator(context.body as object)) {
         return {
           status: 400,
@@ -48,7 +48,7 @@ export const signInHandler = <T>(
       }
 
       const service: DatabaseService<
-        NavigationResult<{ authToken: string; profile: T }>
+        NavigationResult<{ authToken: string } & T>
       > = async (db, session) => {
         const email = context.body['email'] as string;
         const profileResult = await getProfile(
@@ -71,8 +71,8 @@ export const signInHandler = <T>(
         return {
           status: 200,
           body: {
+            ...profileResult.data,
             authToken: authResult.data.token,
-            profile: profileResult.data,
           },
         };
       };
