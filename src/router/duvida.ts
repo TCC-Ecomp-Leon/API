@@ -7,6 +7,10 @@ const duvidaController = new DuvidaController();
 
 const baseUrl = '/duvida';
 
+router.get(
+  baseUrl + '/:id',
+  duvidaController.obterDuvida.bind(duvidaController)
+);
 router.put(
   baseUrl + '/:id',
   duvidaController.iteragirDuvida.bind(duvidaController)
