@@ -156,14 +156,118 @@ const lerAtividade = async (
   );
 };
 
-const lerAtividades = async (
+const lerAtividadesDissertativas = (
+  situacao: SituacaoAtividadeLeitura | undefined,
+  universitario: boolean,
+  db: Db,
+  session: ClientSession,
+  additionalFilter?: {
+    key: keyof Atividade;
+    value: any;
+  }
+): Promise<DatabaseResult<Atividade[]>> => {
+  const campoTipoAtividade: keyof Atividade = 'tipoAtividade';
+  const campoFechamento: keyof (Atividade & {
+    tipoAtividade: TipoAtividade.Dissertativa;
+  }) = universitario ? 'fechamentoCorrecoes' : 'fechamentoRespostas';
+
+  const searchFields: SearchType<Atividade>[] = [
+    {
+      key: campoTipoAtividade,
+      value: TipoAtividade.Dissertativa,
+    },
+  ];
+
+  if (additionalFilter !== undefined) {
+    searchFields.push({
+      key: additionalFilter.key,
+      value: additionalFilter.value,
+    });
+  }
+
+  if (situacao !== undefined) {
+    if (situacao === SituacaoAtividadeLeitura.aberta) {
+      searchFields.push({ key: campoFechamento, value: { $gt: new Date() } });
+    } else if (situacao === SituacaoAtividadeLeitura.fechada) {
+      searchFields.push({ key: campoFechamento, value: { $lt: new Date() } });
+    }
+  }
+
+  return Database.readDatas<Atividade, Atividade>(
+    collection,
+    searchFields,
+    db,
+    session
+  );
+};
+
+const lerAtividadesBancoDeQuestoes = (
   situacao: SituacaoAtividadeLeitura | undefined,
   db: Db,
-  session: ClientSession
+  session: ClientSession,
+  additionalFilter?: {
+    key: keyof Atividade;
+    value: any;
+  }
 ): Promise<DatabaseResult<Atividade[]>> => {
+  const campoTipoAtividade: keyof Atividade = 'tipoAtividade';
   const campoFechamento: keyof Atividade = 'fechamentoRespostas';
 
-  const searchFields: SearchType<Atividade>[] = [];
+  const searchFields: SearchType<Atividade>[] = [
+    {
+      key: campoTipoAtividade,
+      value: TipoAtividade.BancoDeQuestoes,
+    },
+  ];
+
+  if (additionalFilter !== undefined) {
+    searchFields.push({
+      key: additionalFilter.key,
+      value: additionalFilter.value,
+    });
+  }
+
+  if (situacao !== undefined) {
+    if (situacao === SituacaoAtividadeLeitura.aberta) {
+      searchFields.push({ key: campoFechamento, value: { $gt: new Date() } });
+    } else if (situacao === SituacaoAtividadeLeitura.fechada) {
+      searchFields.push({ key: campoFechamento, value: { $lt: new Date() } });
+    }
+  }
+
+  return Database.readDatas<Atividade, Atividade>(
+    collection,
+    searchFields,
+    db,
+    session
+  );
+};
+
+const lerAtividadesAlternativas = (
+  situacao: SituacaoAtividadeLeitura | undefined,
+  db: Db,
+  session: ClientSession,
+  additionalFilter?: {
+    key: keyof Atividade;
+    value: any;
+  }
+): Promise<DatabaseResult<Atividade[]>> => {
+  const campoTipoAtividade: keyof Atividade = 'tipoAtividade';
+  const campoFechamento: keyof Atividade = 'fechamentoRespostas';
+
+  const searchFields: SearchType<Atividade>[] = [
+    {
+      key: campoTipoAtividade,
+      value: TipoAtividade.Alternativa,
+    },
+  ];
+
+  if (additionalFilter !== undefined) {
+    searchFields.push({
+      key: additionalFilter.key,
+      value: additionalFilter.value,
+    });
+  }
 
   if (situacao !== undefined) {
     if (situacao === SituacaoAtividadeLeitura.aberta) {
@@ -182,30 +286,66 @@ const lerAtividades = async (
 };
 
 const lerAtividadesEspecificas = async (
-  key: keyof Atividade,
+  key: 'idMateria' | 'idCurso' | 'idProjeto',
   value: any,
   situacao: SituacaoAtividadeLeitura | undefined,
+  aluno: boolean,
+  universitario: boolean,
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<Atividade[]>> => {
-  const campoFechamento: keyof Atividade = 'fechamentoRespostas';
+  let atividades: Atividade[] = [];
 
-  const searchFields: SearchType<Atividade>[] = [{ key: key, value: value }];
-
-  if (situacao !== undefined) {
-    if (situacao === SituacaoAtividadeLeitura.aberta) {
-      searchFields.push({ key: campoFechamento, value: { $gt: new Date() } });
-    } else if (situacao === SituacaoAtividadeLeitura.fechada) {
-      searchFields.push({ key: campoFechamento, value: { $lt: new Date() } });
+  if (!universitario) {
+    const leituraAtividadesAlternativas = await lerAtividadesAlternativas(
+      situacao,
+      db,
+      session,
+      { key: key, value: value }
+    );
+    if (!leituraAtividadesAlternativas.success) {
+      return leituraAtividadesAlternativas;
     }
+
+    atividades = [...atividades, ...leituraAtividadesAlternativas.data];
   }
 
-  return Database.readDatas<Atividade, Atividade>(
-    collection,
-    searchFields,
+  if (!aluno) {
+    const leituraAtividadesBancoDeQuestoes = await lerAtividadesBancoDeQuestoes(
+      situacao,
+      db,
+      session,
+      { key: key, value: value }
+    );
+
+    if (!leituraAtividadesBancoDeQuestoes.success) {
+      return leituraAtividadesBancoDeQuestoes;
+    }
+
+    atividades = [...atividades, ...leituraAtividadesBancoDeQuestoes.data];
+  }
+
+  const leituraAtividadesDisserativas = await lerAtividadesDissertativas(
+    situacao,
+    universitario,
     db,
-    session
+    session,
+    {
+      key: key,
+      value: value,
+    }
   );
+
+  if (!leituraAtividadesDisserativas.success) {
+    return leituraAtividadesDisserativas;
+  }
+
+  atividades = [...atividades, ...leituraAtividadesDisserativas.data];
+
+  return {
+    success: true,
+    data: atividades,
+  };
 };
 
 const removerAtividade = async (
@@ -228,7 +368,6 @@ export default {
   addAtividadeDissertativa,
   addAtividadeBancoDeQuestoes,
   lerAtividade,
-  lerAtividades,
   lerAtividadesEspecificas,
   removerAtividade,
 };

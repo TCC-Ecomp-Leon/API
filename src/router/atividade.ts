@@ -17,6 +17,6 @@ router.post(
   atividadeController.criarAtividade.bind(atividadeController)
 );
 router.get(
-  baseUrl,
+  baseUrl + '/:idCurso',
   atividadeController.listarAtividades.bind(atividadeController)
 );

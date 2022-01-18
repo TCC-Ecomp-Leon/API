@@ -18,28 +18,13 @@ export const listarAtividadesHandler = new Handler(
   async (context): Promise<NavigationResult<{ atividades: Atividade[] }>> => {
     const userProfile = getCurrentProfile<Perfil>(context);
 
-    const queryParamProjeto = context.query['projeto'];
-    const queryParamMateria = context.query['materia'];
-    const queryParamCurso = context.query['curso'];
+    const idCurso = context.params['idCurso'] as string;
 
     const queryParamAbertas = context.query['abertas'];
-
-    let idProjeto: string | undefined = undefined;
-    let idCurso: string | undefined = undefined;
-    let idMateria: string | undefined = undefined;
 
     let lerAtividadesAbertas: SituacaoAtividadeLeitura =
       SituacaoAtividadeLeitura.todas;
 
-    if (queryParamProjeto !== undefined) {
-      idProjeto = queryParamProjeto as string;
-    }
-    if (queryParamCurso !== undefined) {
-      idCurso = queryParamCurso as string;
-    }
-    if (queryParamMateria !== undefined) {
-      idMateria = queryParamMateria as string;
-    }
     if (queryParamAbertas !== undefined) {
       const param = queryParamAbertas as string;
       if (param === 'true') {
@@ -52,58 +37,26 @@ export const listarAtividadesHandler = new Handler(
     const service: DatabaseService<
       NavigationResult<{ atividades: Atividade[] }>
     > = async (db, session) => {
-      let result: DatabaseResult<Atividade[]>;
-      if (idMateria !== undefined) {
-        result = await RepositorioAtividade.lerAtividadesEspecificas(
-          'idMateria',
-          idMateria,
-          lerAtividadesAbertas,
-          db,
-          session
-        );
-      } else if (idCurso !== undefined) {
-        result = await RepositorioAtividade.lerAtividadesEspecificas(
-          'idCurso',
-          idCurso,
-          lerAtividadesAbertas,
-          db,
-          session
-        );
-      } else if (idProjeto !== undefined) {
-        result = await RepositorioAtividade.lerAtividadesEspecificas(
-          'idProjeto',
-          idProjeto,
-          lerAtividadesAbertas,
-          db,
-          session
-        );
-      } else {
-        if (userProfile.regra === RegraPerfil.Projeto) {
-          const leituraProjeto = await RepositorioProjeto.readProjetoPorEmail(
-            userProfile.email,
-            db,
-            session
-          );
-          if (!leituraProjeto.success) {
-            throw leituraProjeto.error;
-          }
+      const aluno =
+        userProfile.regra === RegraPerfil.Geral &&
+        userProfile.associacoes.aluno.alunoParceiro &&
+        userProfile.associacoes.aluno.cursos.filter(
+          (curso) => curso.id == idCurso
+        ).length > 0;
+      const universitario =
+        !aluno &&
+        userProfile.regra === RegraPerfil.Geral &&
+        userProfile.universitario.universitario;
 
-          idProjeto = leituraProjeto.data.id;
-          result = await RepositorioAtividade.lerAtividadesEspecificas(
-            'idProjeto',
-            idProjeto,
-            lerAtividadesAbertas,
-            db,
-            session
-          );
-        } else {
-          result = await RepositorioAtividade.lerAtividades(
-            lerAtividadesAbertas,
-            db,
-            session
-          );
-        }
-      }
+      const result = await RepositorioAtividade.lerAtividadesEspecificas(
+        'idCurso',
+        idCurso,
+        lerAtividadesAbertas,
+        aluno,
+        universitario,
+        db,
+        session
+      );
 
       if (!result.success) {
         throw result.error;
