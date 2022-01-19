@@ -7,6 +7,12 @@ const respostasAtividadesController = new RespostasAtividadesController();
 
 const baseUrl = '/resposta-atividade';
 
+router.get(
+  baseUrl + '/:idPerfil' + '/:idAtividade',
+  respostasAtividadesController.lerRespostasPorPerfil.bind(
+    respostasAtividadesController
+  )
+);
 router.post(
   baseUrl + '/:idAtividade',
   respostasAtividadesController.responderAtividade.bind(

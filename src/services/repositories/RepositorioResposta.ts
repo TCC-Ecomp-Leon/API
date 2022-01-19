@@ -337,6 +337,97 @@ const lerRespostasEspecificas = async (
   };
 };
 
+const lerRespostasDeUmAlunoEmUmaAtividade = async (
+  idAtividade: string,
+  idAluno: string,
+  db: Db,
+  session: ClientSession
+): Promise<DatabaseResult<RespostaAtividade[]>> => {
+  const campoIdAluno = 'idAluno';
+  const campoIdAtividade = 'idAtividade';
+  const leitura = await Database.readDatas<
+    RespostaAtividade,
+    RespostaAtividade
+  >(
+    collection,
+    [
+      {
+        key: campoIdAluno,
+        value: idAluno,
+      },
+      {
+        key: campoIdAtividade,
+        value: idAtividade,
+      },
+    ],
+    db,
+    session
+  );
+
+  if (!leitura.success) return leitura;
+
+  const dados = leitura.data;
+  const lista: RespostaAtividade[] = [];
+
+  for (let i = 0; i < dados.length; i++) {
+    const dado = dados[i];
+
+    if (dado.tipo === TipoAtividade.Alternativa) {
+      const leituraAtividade = await RepositorioAtividade.lerAtividade(
+        dado.idAtividade,
+        db,
+        session
+      );
+
+      if (!leituraAtividade.success) return leituraAtividade;
+
+      const atividade = leituraAtividade.data;
+      if (atividade.tipoAtividade !== TipoAtividade.Alternativa) {
+        return {
+          success: false,
+          error: Error('Resposta alternativa de atividade não alternativa'),
+        };
+      }
+
+      lista.push(completarAtividadeAlternativa(dado, atividade));
+    } else {
+      lista.push(dado);
+    }
+  }
+
+  return {
+    success: true,
+    data: lista,
+  };
+};
+
+const lerRespostasBancoDeQuestoesUniversitario = (
+  idUniversitario: string,
+  db: Db,
+  session: ClientSession
+): Promise<DatabaseResult<RespostaAtividade[]>> => {
+  const campoTipoAtividade: keyof RespostaAtividade = 'tipo';
+  const campoIdUniversitario: keyof (RespostaAtividade & {
+    tipo: TipoAtividade.BancoDeQuestoes;
+  }) = 'idUniversitario';
+
+  return Database.readDatas<RespostaAtividade, RespostaAtividade>(
+    collection,
+    [
+      {
+        key: campoTipoAtividade,
+        value: TipoAtividade.BancoDeQuestoes,
+      },
+      {
+        key: campoIdUniversitario,
+        value: idUniversitario,
+      },
+    ],
+    db,
+    session
+  );
+};
+
 const corrigirAtividadeDissertativa = (
   id: string,
   idPerfil: string,
@@ -558,4 +649,6 @@ export default {
   requisitarRevisaoAtividadeDissertativa,
   finalizarRevisaoAtividadeDissertativa,
   avaliarRespostasBanco,
+  lerRespostasDeUmAlunoEmUmaAtividade,
+  lerRespostasBancoDeQuestoesUniversitario,
 };

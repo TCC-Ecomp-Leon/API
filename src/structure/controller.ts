@@ -11,6 +11,7 @@ export default class Controller {
 
     const handlersResponse = await navigation.navigate(context);
     if (handlersResponse.success) {
+      console.log(handlersResponse.status);
       console.log(handlersResponse.body);
       res.status(handlersResponse.status).send(handlersResponse.body);
     } else {
