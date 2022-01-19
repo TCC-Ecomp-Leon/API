@@ -146,11 +146,11 @@ export const withDatabaseTransaction = async <T>(
         if (rollback !== undefined && rollback) {
           await session.abortTransaction();
           await session.endSession();
-          await client.close();
+          // await client.close();
         } else {
           await session.commitTransaction();
           await session.endSession();
-          await client.close();
+          // await client.close();
         }
         resolve(result);
       }, transactionOptions);
@@ -158,7 +158,7 @@ export const withDatabaseTransaction = async <T>(
       console.warn('MONGODB ERROR');
       console.warn(e);
       await session.endSession();
-      await client.close();
+      // await client.close();
       reject(e);
     }
   });
