@@ -3,6 +3,7 @@ import { Express, Request, Response } from 'express';
 import { criarAtividadeNavigation } from '../navigations/atividades/criarAtividade';
 import { listarAtividadesNavigation } from '../navigations/atividades/listarAtividades';
 import { removerAtividadeNavigation } from '../navigations/atividades/removerAtividade';
+import { obterAtividadeNavigation } from '../navigations/atividades/obterAtividade';
 
 export class AtividadeController extends Controller {
   criarAtividade(req: Request, res: Response) {
@@ -15,5 +16,9 @@ export class AtividadeController extends Controller {
 
   removerAtividade(req: Request, res: Response) {
     this.runNavigation(removerAtividadeNavigation, req, res);
+  }
+
+  obterAtividade(req: Request, res: Response) {
+    this.runNavigation(obterAtividadeNavigation, req, res);
   }
 }

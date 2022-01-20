@@ -8,6 +8,10 @@ const atividadeController = new AtividadeController();
 
 const baseUrl = '/atividade';
 
+router.get(
+  baseUrl + '/unica/:idAtividade',
+  atividadeController.obterAtividade.bind(atividadeController)
+);
 router.delete(
   baseUrl + '/:id',
   atividadeController.removerAtividade.bind(atividadeController)
