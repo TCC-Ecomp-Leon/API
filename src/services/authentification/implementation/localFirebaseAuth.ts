@@ -356,7 +356,7 @@ const readAuthProfile = async (
     success: true,
     data: {
       email: find.email,
-      emailVerified: false,
+      emailVerified: true,
     },
   };
 };

@@ -50,7 +50,7 @@ export default class Navigation {
   }
 }
 
-const getProfile = async (
+export const getProfile = async (
   userId: string,
   email: string,
   verifiedEmail: boolean,

@@ -8,7 +8,7 @@ import dummyService from '../../services/data/dummyService';
 import RepositorioPerfil from '../../services/repositories/RepositorioPerfil';
 import Context from '../../structure/context';
 import Handler from '../../structure/handler';
-import { NavigationResult } from '../../structure/navigation';
+import { getProfile, NavigationResult } from '../../structure/navigation';
 
 export const getProfileHandler = new Handler(
   async (context: Context): Promise<NavigationResult<Perfil>> => {
@@ -28,15 +28,15 @@ export const getProfileHandler = new Handler(
         };
       }
 
-      const readPerfil = await RepositorioPerfil.readPerfil(
+      const profileResult = await getProfile(
         profileId,
         authInfo.data.email,
         authInfo.data.emailVerified,
-        db,
-        session
+        session,
+        db
       );
 
-      if (!readPerfil.success) {
+      if (!profileResult.success || profileResult.data === null) {
         return {
           status: 404,
           body: {
@@ -47,7 +47,7 @@ export const getProfileHandler = new Handler(
 
       return {
         status: 200,
-        body: readPerfil.data,
+        body: profileResult.data,
       };
     };
 
