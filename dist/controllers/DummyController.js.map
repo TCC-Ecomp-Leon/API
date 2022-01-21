@@ -1,0 +1,1 @@
+{"version":3,"file":"DummyController.js","sourceRoot":"","sources":["../../src/controllers/DummyController.ts"],"names":[],"mappings":";;;;;;AAAA,gFAA6E;AAC7E,yEAAiD;AAGjD,MAAa,eAAgB,SAAQ,oBAAU;IAC7C,QAAQ,CAAC,GAAY,EAAE,GAAa;QAClC,IAAI,CAAC,aAAa,CAAC,uCAAkB,EAAE,GAAG,EAAE,GAAG,CAAC,CAAC;IACnD,CAAC;CACF;AAJD,0CAIC"}

@@ -1,0 +1,33 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const body_parser_1 = require("body-parser");
+const dummy_1 = require("./router/dummy");
+const auth_1 = require("./router/auth");
+const profile_1 = require("./router/profile");
+const projeto_1 = require("./router/projeto");
+const curso_1 = require("./router/curso");
+const codigoDeEntrada_1 = require("./router/codigoDeEntrada");
+const cursoUniversitario_1 = require("./router/cursoUniversitario");
+const duvida_1 = require("./router/duvida");
+const atividade_1 = require("./router/atividade");
+const respostasAtividades_1 = require("./router/respostasAtividades");
+const bancoDeQuestoes_1 = require("./router/bancoDeQuestoes");
+const app = express_1.default();
+app.use(body_parser_1.json({ limit: '50mb' }));
+app.use(dummy_1.router);
+app.use(auth_1.router);
+app.use(profile_1.router);
+app.use(projeto_1.router);
+app.use(curso_1.router);
+app.use(codigoDeEntrada_1.router);
+app.use(cursoUniversitario_1.router);
+app.use(duvida_1.router);
+app.use(atividade_1.router);
+app.use(respostasAtividades_1.router);
+app.use(bancoDeQuestoes_1.router);
+exports.default = app;
+//# sourceMappingURL=app.js.map

@@ -6,8 +6,6 @@ node_modules
 
 *.local.ts
 
-dist
-
 .localAuth.json
 
 .localAuth.test.json
