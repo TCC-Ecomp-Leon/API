@@ -6,7 +6,8 @@
   "scripts": {
     "mock": "ts-node src/env.ts; ts-node src/mocks/index.ts",
     "cleardata": "ts-node src/env.ts; ts-node-dev tests_e2e/test_data.ts",
-    "start": "ts-node src/env.ts; ts-node src/index.ts",
+    "env": "ts-node src/env.ts",
+    "start": "ts-node src/index.ts",
     "dev": "ts-node src/env.ts; ts-node-dev src/index.ts",
     "pretest": "ENV='TEST' ts-node-dev tests_e2e/test_data.ts ; ENV='TEST' ts-node src/mocks/index.ts",
     "test": "ENV='TEST' jest --maxWorkers=1"
