@@ -9,7 +9,7 @@
     "env": "ts-node src/env.ts",
     "start": "node dist/index.js",
     "dev": "ts-node src/env.ts; ts-node-dev src/index.ts",
-    "pretest": "ENV='TEST' ts-node-dev tests_e2e/test_data.ts ; ENV='TEST' ts-node src/mocks/index.ts",
+    "pretest": "ENV='TEST' ts-node src/env.ts; ENV='TEST' ts-node-dev tests_e2e/test_data.ts ; ENV='TEST' ts-node src/mocks/index.ts",
     "test": "ENV='TEST' jest --maxWorkers=1"
   },
   "jest": {
