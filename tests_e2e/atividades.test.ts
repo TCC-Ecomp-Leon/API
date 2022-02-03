@@ -98,11 +98,9 @@ beforeAll(async () => {
 });
 
 test('Registro de uma atividade alternativa', async () => {
-  const atividadesAntesProjeto = await obterListaAtividades(
+  const atividadesAntesCurso = await obterListaAtividades(
     projetoAuthToken,
-    undefined,
-    undefined,
-    undefined,
+    idCurso,
     undefined
   );
 
@@ -114,8 +112,8 @@ test('Registro de uma atividade alternativa', async () => {
     idProjeto: idProjeto,
     idCurso: idCurso,
     idMateria: null,
-    aberturaRespostas: subDays(new Date(), 1) as any as string,
-    fechamentoRespostas: addDays(new Date(), 1) as any as string,
+    aberturaRespostas: (subDays(new Date(), 1) as any) as string,
+    fechamentoRespostas: (addDays(new Date(), 1) as any) as string,
     notaReferencia: 10,
     questoes: [
       {
@@ -177,21 +175,19 @@ test('Registro de uma atividade alternativa', async () => {
   });
   atividadeAlternativaRegistrada = atividadeRegistrada;
 
-  const atividadesDepoisProjeto = await obterListaAtividades(
+  const atividadesDepoisCurso = await obterListaAtividades(
     projetoAuthToken,
-    undefined,
-    undefined,
-    undefined,
+    idCurso,
     undefined
   );
   expect(
-    atividadesDepoisProjeto.length - atividadesAntesProjeto.length
+    atividadesDepoisCurso.length - atividadesAntesCurso.length
   ).toStrictEqual(1);
 
-  const idAtividadesAntes = atividadesAntesProjeto.map(
+  const idAtividadesAntes = atividadesAntesCurso.map(
     (atividade) => atividade.id
   );
-  const novaAtividade = atividadesDepoisProjeto.find(
+  const novaAtividade = atividadesDepoisCurso.find(
     (atividade) => !idAtividadesAntes.includes(atividade.id)
   );
   expect(novaAtividade !== undefined).toBe(true);
@@ -200,11 +196,9 @@ test('Registro de uma atividade alternativa', async () => {
 });
 
 test('Registro de uma atividade dissertativa', async () => {
-  const atividadesAntesProjeto = await obterListaAtividades(
+  const atividadesAntesCurso = await obterListaAtividades(
     projetoAuthToken,
-    undefined,
-    undefined,
-    undefined,
+    idCurso,
     undefined
   );
 
@@ -216,9 +210,9 @@ test('Registro de uma atividade dissertativa', async () => {
     idProjeto: idProjeto,
     idCurso: idCurso,
     idMateria: null,
-    aberturaRespostas: subDays(new Date(), 1) as any as string,
-    fechamentoRespostas: addDays(new Date(), 1) as any as string,
-    fechamentoCorrecoes: addDays(new Date(), 2) as any as string,
+    aberturaRespostas: (subDays(new Date(), 1) as any) as string,
+    fechamentoRespostas: (addDays(new Date(), 1) as any) as string,
+    fechamentoCorrecoes: (addDays(new Date(), 2) as any) as string,
     tempoColaboracao: 2,
     notaReferencia: 10,
     questoes: [
@@ -277,21 +271,19 @@ test('Registro de uma atividade dissertativa', async () => {
   });
   atividadeDissertativaRegistrada = atividadeRegistrada;
 
-  const atividadesDepoisProjeto = await obterListaAtividades(
+  const atividadesDepoisCurso = await obterListaAtividades(
     projetoAuthToken,
-    undefined,
-    undefined,
-    undefined,
+    idCurso,
     undefined
   );
   expect(
-    atividadesDepoisProjeto.length - atividadesAntesProjeto.length
+    atividadesDepoisCurso.length - atividadesAntesCurso.length
   ).toStrictEqual(1);
 
-  const idAtividadesAntes = atividadesAntesProjeto.map(
+  const idAtividadesAntes = atividadesAntesCurso.map(
     (atividade) => atividade.id
   );
-  const novaAtividade = atividadesDepoisProjeto.find(
+  const novaAtividade = atividadesDepoisCurso.find(
     (atividade) => !idAtividadesAntes.includes(atividade.id)
   );
   expect(novaAtividade !== undefined).toBe(true);
@@ -300,11 +292,9 @@ test('Registro de uma atividade dissertativa', async () => {
 });
 
 test('Registro de uma atividade de banco de questões', async () => {
-  const atividadesAntesProjeto = await obterListaAtividades(
+  const atividadesAntesCurso = await obterListaAtividades(
     projetoAuthToken,
-    undefined,
-    undefined,
-    undefined,
+    idCurso,
     undefined
   );
 
@@ -316,8 +306,8 @@ test('Registro de uma atividade de banco de questões', async () => {
     idProjeto: idProjeto,
     idCurso: idCurso,
     idMateria: null,
-    aberturaRespostas: subDays(new Date(), 1) as any as string,
-    fechamentoRespostas: addDays(new Date(), 1) as any as string,
+    aberturaRespostas: (subDays(new Date(), 1) as any) as string,
+    fechamentoRespostas: (addDays(new Date(), 1) as any) as string,
     tempoColaboracao: 2,
     assuntos: ['Matemática', 'Física'],
   };
@@ -349,21 +339,19 @@ test('Registro de uma atividade de banco de questões', async () => {
   });
   atividadeBancoRegistrada = atividadeRegistrada;
 
-  const atividadesDepoisProjeto = await obterListaAtividades(
+  const atividadesDepoisCurso = await obterListaAtividades(
     projetoAuthToken,
-    undefined,
-    undefined,
-    undefined,
+    idCurso,
     undefined
   );
   expect(
-    atividadesDepoisProjeto.length - atividadesAntesProjeto.length
+    atividadesDepoisCurso.length - atividadesAntesCurso.length
   ).toStrictEqual(1);
 
-  const idAtividadesAntes = atividadesAntesProjeto.map(
+  const idAtividadesAntes = atividadesAntesCurso.map(
     (atividade) => atividade.id
   );
-  const novaAtividade = atividadesDepoisProjeto.find(
+  const novaAtividade = atividadesDepoisCurso.find(
     (atividade) => !idAtividadesAntes.includes(atividade.id)
   );
   expect(novaAtividade !== undefined).toBe(true);
@@ -374,35 +362,15 @@ test('Registro de uma atividade de banco de questões', async () => {
 test('Listagem de atividades de um projeto e curso', async () => {
   const todasAtividades = await obterListaAtividades(
     projetoAuthToken,
-    undefined,
-    undefined,
-    undefined,
-    undefined
-  );
-  const atividadesProjeto = await obterListaAtividades(
-    projetoAuthToken,
-    idProjeto,
-    undefined,
-    undefined,
-    undefined
-  );
-  const atividadesCurso = await obterListaAtividades(
-    projetoAuthToken,
-    undefined,
     idCurso,
-    undefined,
     undefined
   );
   const todasAtividadesAbertas = await obterListaAtividades(
     projetoAuthToken,
-    undefined,
-    undefined,
-    undefined,
+    idCurso,
     true
   );
 
-  expect(todasAtividades).toStrictEqual(atividadesProjeto);
-  expect(todasAtividades).toStrictEqual(atividadesCurso);
   expect(todasAtividades).toStrictEqual(todasAtividadesAbertas);
 });
 
@@ -535,11 +503,10 @@ test('Responder uma atividade banco de questões', async () => {
   expect(
     perfilUniversitarioPosCorrecao.universitario.atividadesQueColaborou.length
   ).toStrictEqual(1);
-  const colaboracaoRegistrada =
-    perfilUniversitarioPosCorrecao.universitario.atividadesQueColaborou.find(
-      (colaboracao) =>
-        colaboracao.idResposta === respostaAtividadeBancoDeQuestoes.id
-    );
+  const colaboracaoRegistrada = perfilUniversitarioPosCorrecao.universitario.atividadesQueColaborou.find(
+    (colaboracao) =>
+      colaboracao.idResposta === respostaAtividadeBancoDeQuestoes.id
+  );
   if (colaboracaoRegistrada === undefined) throw Error('');
   expect(colaboracaoRegistrada.aprovado).toStrictEqual(false);
   expect(colaboracaoRegistrada.horas).toStrictEqual(
@@ -583,15 +550,16 @@ test('Simulação de uma atividade alternativa já fechada para visualizar a not
 test('Correção resposta dissertaviva', async () => {
   const idResposta = respostaAtividadeDissertativa.id;
 
-  const informacoes: InformacoesCorrecaoQuestoesDissertativas =
-    respostaAtividadeDissertativa.respostas.map((resposta) => {
+  const informacoes: InformacoesCorrecaoQuestoesDissertativas = respostaAtividadeDissertativa.respostas.map(
+    (resposta) => {
       return {
         idQuestao: resposta.idQuestao,
         nota: 8,
         status: StatusRespostaDissertativa.ParcialmenteCerto,
         comentarios: 'teste',
       };
-    });
+    }
+  );
 
   const result = await request(app)
     .put(respostaEndpoint + '/' + idResposta)
@@ -624,11 +592,9 @@ test('Correção resposta dissertaviva', async () => {
   expect(
     perfilUniversitarioPosCorrecao.universitario.atividadesQueColaborou.length
   ).toStrictEqual(2);
-  const colaboracaoRegistrada =
-    perfilUniversitarioPosCorrecao.universitario.atividadesQueColaborou.find(
-      (colaboracao) =>
-        colaboracao.idResposta === respostaAtividadeDissertativa.id
-    );
+  const colaboracaoRegistrada = perfilUniversitarioPosCorrecao.universitario.atividadesQueColaborou.find(
+    (colaboracao) => colaboracao.idResposta === respostaAtividadeDissertativa.id
+  );
   if (colaboracaoRegistrada === undefined) throw Error('');
   expect(colaboracaoRegistrada.aprovado).toStrictEqual(true);
   expect(colaboracaoRegistrada.horas).toStrictEqual(
@@ -703,17 +669,12 @@ const obterListaQuestoesBancoDeQuestoes = async (
 
 const obterListaAtividades = async (
   authToken: string,
-  idProjeto: string | undefined,
   idCurso: string | undefined,
-  idMateria: string | undefined,
   abertas: boolean | undefined
 ): Promise<Atividade[]> => {
   const responde = await request(app)
-    .get(atividadeEndpoint)
+    .get(atividadeEndpoint + '/' + idCurso)
     .set(`Authorization`, `Bearer ${authToken}`)
-    .query(idProjeto !== undefined ? { projeto: idProjeto } : {})
-    .query(idCurso !== undefined ? { curso: idCurso } : {})
-    .query(idMateria !== undefined ? { materia: idMateria } : {})
     .query(abertas !== undefined ? { abertas: abertas } : {});
 
   expect(responde.statusCode).toStrictEqual(200);
