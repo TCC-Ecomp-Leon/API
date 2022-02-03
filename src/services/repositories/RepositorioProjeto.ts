@@ -254,6 +254,43 @@ const adicionarCurso = (
   );
 };
 
+const adicionarMateria = async (
+  idProjeto: string,
+  idCurso: string,
+  materia: Omit<Materia, 'id' | 'idPerfilProfessor' | 'idCurso'>,
+  db: Db,
+  session: ClientSession
+): Promise<DatabaseResult<null>> => {
+  const leituraCursos = await readCursosProjeto(idProjeto, db, session);
+  if (!leituraCursos.success) {
+    return leituraCursos;
+  }
+
+  const cursos = leituraCursos.data;
+  const indexCurso = cursos.map((curso) => curso.id).indexOf(idCurso);
+  if (indexCurso < 0) {
+    return {
+      success: false,
+      error: Error('Curso não encontrado'),
+    };
+  }
+
+  const _materia: Materia = {
+    ...materia,
+    id: uuid(),
+    idCurso: idCurso,
+  };
+
+  const materias = [...cursos[indexCurso].materias, _materia];
+  return await atualizarCurso(
+    idProjeto,
+    idCurso,
+    { materias: materias },
+    db,
+    session
+  );
+};
+
 const adicionarAlunoAoCurso = (
   idProjeto: string,
   idCurso: string,
@@ -377,6 +414,7 @@ export default {
   adicionarProjeto, //testado
   aprovarProjeto, //testado
   adicionarCurso, //testado
+  adicionarMateria,
   adicionarAlunoAoCurso, //testado
   atribuirProfessorAMateria, //testado
   removerProjetoPorEmail,

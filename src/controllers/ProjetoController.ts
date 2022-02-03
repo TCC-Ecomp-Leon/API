@@ -6,7 +6,6 @@ import { getProjetosNaoAprovadosNavigation } from '../navigations/projeto/getPro
 import { getProjetosNavigation } from '../navigations/projeto/getProjetos';
 import { atualizarProjetoNavigation } from '../navigations/projeto/atualizarProjeto';
 import { getProjetoNavigation } from '../navigations/projeto/getProjeto';
-
 export class ProjetoController extends Controller {
   registrarProjeto(req: Request, res: Response) {
     this.runNavigation(registrarProjetoNavigation, req, res);

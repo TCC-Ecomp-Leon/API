@@ -10,6 +10,10 @@ router.put(
   cursoController.atualizarCurso.bind(cursoController)
 );
 router.post(
+  '/cursos/:idProjeto/:idCurso/materia',
+  cursoController.adicionarMateria.bind(cursoController)
+);
+router.post(
   '/cursos/:idProjeto',
   cursoController.registrarCurso.bind(cursoController)
 );

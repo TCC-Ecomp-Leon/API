@@ -1,5 +1,5 @@
 import Ajv, { JSONSchemaType } from 'ajv';
-import { Curso } from '../models';
+import { Curso, Materia } from '../models';
 import { schemaMateria } from './materia';
 import addFormats from 'ajv-formats';
 
@@ -55,5 +55,17 @@ const atualizacaoCurso: JSONSchemaType<
   additionalProperties: true,
 };
 
+const novaMateriaCurso: JSONSchemaType<
+  Omit<Materia, 'id' | 'idPerfilProfessor' | 'idCurso'>
+> = {
+  type: 'object',
+  properties: {
+    nome: { type: 'string' },
+    descricao: { type: 'string' },
+  },
+  required: ['nome', 'descricao'],
+};
+
 export const ValidateCurso = ajv.compile(curso);
 export const ValidateAtualizacaoCurso = ajv.compile(atualizacaoCurso);
+export const ValidateMateria = ajv.compile(novaMateriaCurso);
