@@ -1,8 +1,13 @@
 import { default as mockPerfil } from './perfil';
 import { default as mockProjeto } from './projeto';
 
-console.log('initializing mocks');
-mockPerfil().then(() => {
-  mockProjeto().then();
+const runMocks = async () => {
+  console.log('initializing mocks');
+  await mockPerfil();
+  await mockProjeto();
+  console.log('finishing mocks');
+};
+
+runMocks().then(() => {
+  process.exit();
 });
-console.log('finishing mocks');
