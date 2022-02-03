@@ -4,16 +4,22 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const context_1 = __importDefault(require("./context"));
+const environmentVariables_1 = __importDefault(require("../config/environmentVariables"));
 class Controller {
     async runNavigation(navigation, req, res) {
+        const env = environmentVariables_1.default();
         const context = new context_1.default(req);
-        console.log(context.method);
-        console.log(context.url);
-        console.log(context.body);
+        if (env.ENV !== 'TEST' && env.ENV !== 'PROD') {
+            console.log(context.method);
+            console.log(context.url);
+            console.log(context.body);
+        }
         const handlersResponse = await navigation.navigate(context);
         if (handlersResponse.success) {
-            console.log(handlersResponse.status);
-            console.log(handlersResponse.body);
+            if (env.ENV !== 'TEST' && env.ENV !== 'PROD') {
+                console.log(handlersResponse.status);
+                console.log(handlersResponse.body);
+            }
             res.status(handlersResponse.status).send(handlersResponse.body);
         }
         else {

@@ -5,9 +5,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const perfil_1 = __importDefault(require("./perfil"));
 const projeto_1 = __importDefault(require("./projeto"));
-console.log('initializing mocks');
-perfil_1.default().then(() => {
-    projeto_1.default().then();
+const runMocks = async () => {
+    console.log('initializing mocks');
+    await perfil_1.default();
+    await projeto_1.default();
+    console.log('finishing mocks');
+};
+runMocks().then(() => {
+    process.exit();
 });
-console.log('finishing mocks');
 //# sourceMappingURL=index.js.map
