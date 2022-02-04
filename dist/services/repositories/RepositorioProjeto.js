@@ -123,6 +123,27 @@ const adicionarCurso = (idProjeto, curso, db, session) => {
         turma: [],
     }, db, session);
 };
+const adicionarMateria = async (idProjeto, idCurso, materia, db, session) => {
+    const leituraCursos = await readCursosProjeto(idProjeto, db, session);
+    if (!leituraCursos.success) {
+        return leituraCursos;
+    }
+    const cursos = leituraCursos.data;
+    const indexCurso = cursos.map((curso) => curso.id).indexOf(idCurso);
+    if (indexCurso < 0) {
+        return {
+            success: false,
+            error: Error('Curso não encontrado'),
+        };
+    }
+    const _materia = {
+        ...materia,
+        id: uuid_1.v4(),
+        idCurso: idCurso,
+    };
+    const materias = [...cursos[indexCurso].materias, _materia];
+    return await atualizarCurso(idProjeto, idCurso, { materias: materias }, db, session);
+};
 const adicionarAlunoAoCurso = (idProjeto, idCurso, idAluno, db, session) => {
     const identificadorProjeto = 'id';
     const identificadorCurso = 'cursos.id';
@@ -173,6 +194,7 @@ exports.default = {
     adicionarProjeto,
     aprovarProjeto,
     adicionarCurso,
+    adicionarMateria,
     adicionarAlunoAoCurso,
     atribuirProfessorAMateria,
     removerProjetoPorEmail,

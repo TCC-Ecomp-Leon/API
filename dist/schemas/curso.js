@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ValidateAtualizacaoCurso = exports.ValidateCurso = void 0;
+exports.ValidateMateria = exports.ValidateAtualizacaoCurso = exports.ValidateCurso = void 0;
 const ajv_1 = __importDefault(require("ajv"));
 const materia_1 = require("./materia");
 const ajv_formats_1 = __importDefault(require("ajv-formats"));
@@ -43,6 +43,15 @@ const atualizacaoCurso = {
     required: [],
     additionalProperties: true,
 };
+const novaMateriaCurso = {
+    type: 'object',
+    properties: {
+        nome: { type: 'string' },
+        descricao: { type: 'string' },
+    },
+    required: ['nome', 'descricao'],
+};
 exports.ValidateCurso = ajv.compile(curso);
 exports.ValidateAtualizacaoCurso = ajv.compile(atualizacaoCurso);
+exports.ValidateMateria = ajv.compile(novaMateriaCurso);
 //# sourceMappingURL=curso.js.map

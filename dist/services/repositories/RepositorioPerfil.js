@@ -9,6 +9,7 @@ const RepositorioProjeto_1 = __importDefault(require("./RepositorioProjeto"));
 const RepositorioCodigoDeEntrada_1 = __importDefault(require("./RepositorioCodigoDeEntrada"));
 const RepositorioUniversitario_1 = __importDefault(require("./RepositorioUniversitario"));
 const images_1 = __importDefault(require("../../assets/images"));
+const environmentVariables_1 = __importDefault(require("../../config/environmentVariables"));
 const collection = 'Perfil';
 const addAdministrador = (
 /**
@@ -101,7 +102,9 @@ id, email, nome, telefone, idCodigoDeEntrada, db, session) => {
         data: true,
     };
 };
-const readPerfil = async (id, email, emailValidado, db, session) => {
+const readPerfil = async (id, email, _emailValidado, db, session) => {
+    const env = environmentVariables_1.default().ENV;
+    const emailValidado = env === 'BETA' || env === 'LOCAL' || _emailValidado;
     const identificadorPerfil = 'id';
     const readPerfil = await Database_1.default.readData(collection, [{ key: identificadorPerfil, value: id }], db, session);
     let perfil;
