@@ -12,6 +12,7 @@ import RepositorioProjeto from './RepositorioProjeto';
 import RepositorioCodigoDeEntrada from './RepositorioCodigoDeEntrada';
 import RepositorioUniversitario from './RepositorioUniversitario';
 import assets from '../../assets/images';
+import environmentVariables from '../../config/environmentVariables';
 
 const collection = 'Perfil';
 
@@ -103,12 +104,11 @@ const addPerfilGeral = async (
   session: ClientSession
 ): Promise<DatabaseResult<boolean>> => {
   if (idCodigoDeEntrada !== undefined) {
-    const readCodigoDeEntrada =
-      await RepositorioCodigoDeEntrada.readCodigoDeEntrada(
-        idCodigoDeEntrada,
-        db,
-        session
-      );
+    const readCodigoDeEntrada = await RepositorioCodigoDeEntrada.readCodigoDeEntrada(
+      idCodigoDeEntrada,
+      db,
+      session
+    );
 
     if (!readCodigoDeEntrada.success) return readCodigoDeEntrada;
 
@@ -176,10 +176,13 @@ const addPerfilGeral = async (
 const readPerfil = async (
   id: string,
   email: string,
-  emailValidado: boolean,
+  _emailValidado: boolean,
   db: Db,
   session: ClientSession
 ): Promise<DatabaseResult<Perfil>> => {
+  const env = environmentVariables().ENV;
+  const emailValidado = env === 'BETA' || env === 'LOCAL' || _emailValidado;
+
   const identificadorPerfil: keyof Perfil = 'id';
 
   const readPerfil = await Database.readData<TipoPerfilBanco>(
@@ -203,21 +206,19 @@ const readPerfil = async (
     );
     if (!readCursosAluno.success) return readCursosAluno;
 
-    const readMateriasProfessor =
-      await RepositorioProjeto.readMateriasProfessor(
-        readPerfil.data.id,
-        db,
-        session
-      );
+    const readMateriasProfessor = await RepositorioProjeto.readMateriasProfessor(
+      readPerfil.data.id,
+      db,
+      session
+    );
     if (!readMateriasProfessor.success) return readMateriasProfessor;
 
-    const informacoesUniversitario =
-      await RepositorioUniversitario.readInformacoesUniversitario(
-        email,
-        emailValidado,
-        db,
-        session
-      );
+    const informacoesUniversitario = await RepositorioUniversitario.readInformacoesUniversitario(
+      email,
+      emailValidado,
+      db,
+      session
+    );
     if (!informacoesUniversitario.success) return informacoesUniversitario;
 
     perfil = {
