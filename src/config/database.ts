@@ -22,7 +22,7 @@ export enum TransactionModes {
    */
   default,
   /**
-   * Mongo db transaction using configurations to sped up connections and without
+   * Mongo db transaction using configurations to speed up connections and without
    * casually consistence guarantee.
    */
   parallel,
@@ -136,8 +136,9 @@ export const withDatabaseTransaction = async <T>(
   await client.connect();
   const session = client.startSession();
 
-  const transactionOptions: TransactionOptions =
-    getTransactionOptions(transactionMode);
+  const transactionOptions: TransactionOptions = getTransactionOptions(
+    transactionMode
+  );
 
   const result = new Promise<T>(async (resolve, reject) => {
     try {
